@@ -60,36 +60,44 @@ java -jar this.jar -classes /tomcat/webapps/your_project/WEB-INF/classes -libs /
 以上两个示例是直接用参数执行，也可以直接执行 java -jar this.jar按照步骤提示输入信息完成加密。
 
 
-====================
-    启动加密后的jar
-====================
+#### 启动加密后的jar
 
 加密后的项目需要设置javaagent来启动项目，项目在启动过程中解密class，完全内存解密，不留下任何解密后的文件。
 
------------------------------
+```
 参数说明
 -data        加密后的jar/war完整路径
 -pwd         密码
+```
 
------------------------------
-示例1: 启动普通jar、springboot的jar
 
-执行: java -javaagent:this.jar='-data /project/springboot-encrypted.jar -pwd 0000000' -jar /project/springboot-encrypted.jar
+##### 示例1: 启动普通jar、springboot的jar
 
+```
+java -javaagent:this.jar='-data /project/springboot-encrypted.jar -pwd 0000000' -jar /project/springboot-encrypted.jar
+```
+
+```
 参数说明:
 -data /project/springboot-encrypted.jar 加密后生成的jar包
 -pwd 0000000                            密码
+```
 
------------------------------
-示例2: tomcat运行解压过的war包
+
+
+#### 示例2: tomcat运行解压过的war包
+
 tomcat catalina.sh 增加以下配置:
+```
 CATALINA_OPTS="$CATALINA_OPTS -javaagent:this.jar='-data /tomcat/webapps/your_project/WEB-INF/classes/classes.dat,/tomcat/webapps/your_project2/WEB-INF/classes/classes.dat -pwd 0000000,123123'";
 export CATALINA_OPTS;
+```
 
-
+```
 参数说明:
 -data classes.dat,classes2.dat  加密后生成的dat文件，一个tomcat可能会有多个项目，所以多个dat文件用逗号隔开
 -pwd 0000000,123123             多个dat依次对应的密码
+```
 
 注:多个项目相同包名类型可能会冲突
 
