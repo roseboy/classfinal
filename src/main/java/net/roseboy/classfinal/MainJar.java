@@ -1,11 +1,11 @@
-package net.roseboy;
+package net.roseboy.classfinal;
 
 
 import javassist.ClassPool;
 import javassist.NotFoundException;
-import net.roseboy.util.ClassUtils;
-import net.roseboy.util.EncryptUtils;
-import net.roseboy.util.IOUtils;
+import net.roseboy.classfinal.util.ClassUtils;
+import net.roseboy.classfinal.util.EncryptUtils;
+import net.roseboy.classfinal.util.IOUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
 import org.apache.commons.compress.archivers.jar.JarArchiveInputStream;

@@ -22,4 +22,5 @@ logs/*
 logs
 /logs
 .DS_Store
+dependency-reduced-pom.xml
 

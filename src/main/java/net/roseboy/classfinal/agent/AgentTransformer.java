@@ -1,6 +1,6 @@
 package net.roseboy.classfinal.agent;
 
-import net.roseboy.util.EncryptUtils;
+import net.roseboy.classfinal.util.EncryptUtils;
 
 import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
