@@ -4,7 +4,7 @@ import javassist.ClassPool;
 import javassist.NotFoundException;
 import net.roseboy.classfinal.util.ClassUtils;
 import net.roseboy.classfinal.util.EncryptUtils;
-import net.roseboy.classfinal.util.IOUtils;
+import net.roseboy.classfinal.util.IoUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -59,7 +59,7 @@ public class Main {
 
             //没有参数手动输入
             Scanner scanner = new Scanner(System.in);
-            if (args == null || args.length == 0 || (args.length == 1 && args[0].equals("-C"))) {
+            if (args == null || args.length == 0 || (args.length == 1 && "-C".equals(args[0]))) {
                 while (path == null || path.length() == 0) {
                     System.out.print("请输入需要加密的classes路径:");
                     path = scanner.nextLine();
@@ -139,7 +139,7 @@ public class Main {
 
         //需要加密目录下的所有class文件
         List<File> classFiles = new ArrayList<>();
-        IOUtils.listFile(classFiles, new File(encryptPath), ".class");
+        IoUtils.listFile(classFiles, new File(encryptPath), ".class");
 
         //需要加密的class名
         List<String> classNames = new ArrayList<>();
@@ -167,7 +167,7 @@ public class Main {
             byte[] bts = ClassUtils.rewriteMethod(pool, classname);
             if (bts != null) {
                 String path = encryptPath + File.separator + classname.replace(".", File.separator) + ".class";
-                IOUtils.writeFile(new File(path), bts);
+                IoUtils.writeFile(new File(path), bts);
             }
         }
         return encryptPath + File.separator + FILE_NAME;

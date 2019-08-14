@@ -5,7 +5,7 @@ import javassist.ClassPool;
 import javassist.NotFoundException;
 import net.roseboy.classfinal.util.ClassUtils;
 import net.roseboy.classfinal.util.EncryptUtils;
-import net.roseboy.classfinal.util.IOUtils;
+import net.roseboy.classfinal.util.IoUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
 import org.apache.commons.compress.archivers.jar.JarArchiveInputStream;
@@ -35,6 +35,7 @@ public class MainJar {
             if (cmd == null) {
                 return;
             }
+            //加密tomcat下已经解压过的war包
             if (cmd.hasOption("C") || cmd.hasOption("classes")) {
                 Main.main(args);
                 return;
@@ -171,7 +172,7 @@ public class MainJar {
         List<String> allFile = unJar(jarPath, targetDir, includeJars);
 
         //[2]按照jar包名分组,只要需要加密的class文件
-        Map<String, List<String>> jarClasses = new HashMap<>();//需要加密的jar名与jar下的所有class类名
+        Map<String, List<String>> jarClasses = new HashMap<>(200);//需要加密的jar名与jar下的所有class类名
         for (String file : allFile) {
             if (!file.endsWith(".class")) {//class文件
                 continue;
@@ -216,7 +217,7 @@ public class MainJar {
                     String classPath = targetDir + File.separator + ClassUtils.realPath(entry.getKey(), classname, jarOrWar);
                     File sourceFile = new File(classPath);
                     zos.putNextEntry(new ZipEntry(classname));
-                    byte[] bytes = IOUtils.readFileToByte(sourceFile);
+                    byte[] bytes = IoUtils.readFileToByte(sourceFile);
                     bytes = EncryptUtils.en(bytes, password);
                     zos.write(bytes, 0, bytes.length);
                     zos.closeEntry();
@@ -225,7 +226,7 @@ public class MainJar {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            IOUtils.close(zos, out);
+            IoUtils.close(zos, out);
         }
 
         //[4]修改class方法体，并保存文件
@@ -242,7 +243,7 @@ public class MainJar {
                 byte[] bts = ClassUtils.rewriteMethod(pool, classname);
                 if (bts != null) {
                     String path = targetDir + File.separator + ClassUtils.realPath(entry.getKey(), classname, jarOrWar);
-                    IOUtils.writeFile(new File(path), bts);
+                    IoUtils.writeFile(new File(path), bts);
                 }
             }
         }
@@ -259,7 +260,7 @@ public class MainJar {
         for (String file : includeJars) {
             File dir = new File(libpath + file.replace(".jar", Main.LIB_JAR_DIR));
             if (dir.exists()) {
-                IOUtils.delete(dir);
+                IoUtils.delete(dir);
             }
         }
 
@@ -269,7 +270,7 @@ public class MainJar {
         //[5.4]删除jar解压出来的目录
         File dir = new File(targetDir);
         if (dir.exists()) {
-            IOUtils.delete(dir);
+            IoUtils.delete(dir);
         }
 
         return result;
@@ -285,7 +286,7 @@ public class MainJar {
      */
     public static String doJar(String jarDir, String targetJar) {
         List<File> files = new ArrayList<>();
-        IOUtils.listFile(files, new File(jarDir));
+        IoUtils.listFile(files, new File(jarDir));
 
         JarArchiveOutputStream jos = null;
         OutputStream out = null;
@@ -312,12 +313,12 @@ public class MainJar {
                     jos.putArchiveEntry(je);
                     jos.closeArchiveEntry();
                 } else if (fileName.endsWith(".jar") || fileName.endsWith(".zip")) {
-                    byte[] bytes = IOUtils.readFileToByte(file);
+                    byte[] bytes = IoUtils.readFileToByte(file);
                     JarArchiveEntry je = new JarArchiveEntry(fileName);
                     je.setMethod(JarArchiveEntry.STORED);
                     je.setSize(bytes.length);
                     je.setTime(System.currentTimeMillis());
-                    je.setCrc(IOUtils.crc32(bytes));
+                    je.setCrc(IoUtils.crc32(bytes));
                     jos.putArchiveEntry(je);
                     jos.write(bytes);
                     jos.closeArchiveEntry();
@@ -326,7 +327,7 @@ public class MainJar {
                     JarArchiveEntry je = new JarArchiveEntry(fileName);
                     je.setTime(System.currentTimeMillis());
                     jos.putArchiveEntry(je);
-                    byte[] bytes = IOUtils.readFileToByte(file);
+                    byte[] bytes = IoUtils.readFileToByte(file);
                     jos.write(bytes);
                     jos.closeArchiveEntry();
                 }
@@ -334,7 +335,7 @@ public class MainJar {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            IOUtils.close(jos);
+            IoUtils.close(jos);
         }
         return targetJar;
     }
@@ -369,9 +370,9 @@ public class MainJar {
                 list.add(targetDir + File.separator + jarEntry.getName());
                 if (jarEntry.getName().endsWith(".jar")) {
                     ByteArrayOutputStream jos0 = new ByteArrayOutputStream();
-                    IOUtils.copy(jis, jos0);
+                    IoUtils.copy(jis, jos0);
                     byte[] bytes = jos0.toByteArray();
-                    IOUtils.writeFile(new File(targetDir + File.separator + jarEntry.getName()), bytes);
+                    IoUtils.writeFile(new File(targetDir + File.separator + jarEntry.getName()), bytes);
                     if (includeJars == null || includeJars.size() == 0 || includeJars.contains(jarEntry.getName().replace("BOOT-INF" + File.separator + "lib" + File.separator, "").replace("WEB-INF" + File.separator + "lib" + File.separator, ""))) {
                         List<String> list0 = unJar(targetDir + File.separator + jarEntry.getName(), targetDir + File.separator + jarEntry.getName().replace(".jar", Main.LIB_JAR_DIR), includeJars);
                         list.addAll(list0);
@@ -384,111 +385,17 @@ public class MainJar {
                     }
                 } else {
                     ByteArrayOutputStream jos0 = new ByteArrayOutputStream();
-                    IOUtils.copy(jis, jos0);
+                    IoUtils.copy(jis, jos0);
                     byte[] bytes = jos0.toByteArray();
-                    IOUtils.writeFile(new File(targetDir + File.separator + jarEntry.getName()), bytes);
+                    IoUtils.writeFile(new File(targetDir + File.separator + jarEntry.getName()), bytes);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            IOUtils.close(jis, fin);
+            IoUtils.close(jis, fin);
         }
-
-
         return list;
-    }
-
-    /**
-     * InputStream in = new FileInputStream(new File(jarPath));
-     * OutputStream out = new FileOutputStream(new File(jarPath2));
-     * encryptJarFile("000000", in, out, null);
-     * in.close();
-     * out.close();
-     *
-     * @param pass
-     * @param in
-     * @param out
-     * @param main
-     * @throws Exception
-     */
-    public static void encryptJarFile(String pass, InputStream in, OutputStream out, JarArchiveOutputStream main) throws Exception {
-        JarArchiveInputStream jis;
-        JarArchiveOutputStream jos;
-
-
-        jos = new JarArchiveOutputStream(out);
-        jis = new JarArchiveInputStream(in);
-
-        if (main == null) {
-            main = jos;
-            main.putArchiveEntry(new JarArchiveEntry("clazz/"));
-            main.closeArchiveEntry();
-        }
-        JarArchiveEntry jarEntry;
-        while ((jarEntry = jis.getNextJarEntry()) != null) {
-            if (jarEntry.getName().endsWith(".jar")) {
-                //System.out.println(jarEntry.getName());
-
-                ByteArrayOutputStream oldjarOut = new ByteArrayOutputStream();
-                IOUtils.copy(jis, oldjarOut);
-                InputStream oldJarIn = new ByteArrayInputStream(oldjarOut.toByteArray());
-                ByteArrayOutputStream newJarOut = new ByteArrayOutputStream();
-                encryptJarFile(pass, oldJarIn, newJarOut, main);
-                oldJarIn.close();
-                oldjarOut.close();
-
-                byte[] bytes = newJarOut.toByteArray();
-                newJarOut.close();
-
-                JarArchiveEntry je = new JarArchiveEntry(jarEntry.getName());
-                je.setMethod(JarArchiveEntry.STORED);
-                je.setSize(bytes.length);
-                je.setTime(jarEntry.getTime());
-                je.setCrc(IOUtils.crc32(bytes));
-                jos.putArchiveEntry(je);
-                jos.write(bytes);
-                jos.closeArchiveEntry();
-            } else if (jarEntry.getName().endsWith(".class")) {
-
-                JarArchiveEntry je = new JarArchiveEntry(jarEntry.getName());
-                je.setTime(jarEntry.getTime());
-                jos.putArchiveEntry(je);
-                ByteArrayOutputStream jos0 = new ByteArrayOutputStream();
-                IOUtils.copy(jis, jos0);
-                byte[] bytes = jos0.toByteArray();
-                jos0.close();
-                jos.write(bytes);
-                jos.closeArchiveEntry();
-
-                if (jarEntry.getName().contains("yiyon")) {
-                    String className = jarEntry.getName().replace("BOOT-INF/classes/", "").replace("WEB-INF/classes/", "").replace(File.separator, ".").replace(".class", "");
-                    JarArchiveEntry ja = new JarArchiveEntry("clazz/" + className);
-                    ja.setTime(jarEntry.getTime());
-                    main.putArchiveEntry(ja);
-                    bytes = EncryptUtils.en(bytes, pass);
-                    main.write(bytes);
-                    main.closeArchiveEntry();
-                    System.out.println(className);
-                }
-            } else if (jarEntry.isDirectory()) {
-                JarArchiveEntry je = new JarArchiveEntry(jarEntry.getName());
-                je.setTime(jarEntry.getTime());
-                jos.putArchiveEntry(je);
-                jos.closeArchiveEntry();
-            } else {
-                JarArchiveEntry je = new JarArchiveEntry(jarEntry.getName());
-                je.setTime(jarEntry.getTime());
-                jos.putArchiveEntry(je);
-                IOUtils.copy(jis, jos);
-                jos.closeArchiveEntry();
-            }
-        }
-
-        jis.close();
-        jos.finish();
-        jos.close();
-
     }
 
 }

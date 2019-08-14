@@ -8,7 +8,6 @@ import net.roseboy.classfinal.Main;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -54,7 +53,7 @@ public class ClassUtils {
     }
 
     /**
-     * 清空方法体，并且保留参数信息
+     * 修改方法体，并且保留参数信息
      *
      * @param m
      * @param src
@@ -118,7 +117,7 @@ public class ClassUtils {
             List<File> jars = new ArrayList<>();
             File dir = new File(path);
             if (dir.isDirectory()) {
-                IOUtils.listFile(jars, dir, ".jar");
+                IoUtils.listFile(jars, dir, ".jar");
                 for (File jar : jars) {
                     pool.insertClassPath(jar.getAbsolutePath());
                 }
@@ -156,13 +155,13 @@ public class ClassUtils {
      */
     public static String realPath(String jar, String className, String warOrJar) {
         String path;
-        String INF = "jar".equals(warOrJar) ? "BOOT-INF" : "WEB-INF";
+        String inf = "jar".equals(warOrJar) ? "BOOT-INF" : "WEB-INF";
         if ("ROOT".equals(jar)) {
             path = "";
         } else if ("CLASSES".equals(jar)) {
-            path = INF + File.separator + "classes";
+            path = inf + File.separator + "classes";
         } else {
-            path = INF + File.separator + "lib" + File.separator + jar + Main.LIB_JAR_DIR;
+            path = inf + File.separator + "lib" + File.separator + jar + Main.LIB_JAR_DIR;
         }
         if (className == null || className.length() == 0) {
             return path;

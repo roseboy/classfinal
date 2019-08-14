@@ -4,7 +4,11 @@ import java.io.*;
 import java.util.List;
 import java.util.zip.CRC32;
 
-public class IOUtils {
+/**
+ * 工具
+ * @author roseboy
+ */
+public class IoUtils {
 
     /**
      * 写文件
@@ -20,12 +24,7 @@ public class IOUtils {
             os.flush();
         } catch (Exception e) {
         } finally {
-            try {
-                if (os != null) {
-                    os.close();
-                }
-            } catch (Exception e) {
-            }
+            close(os);
         }
     }
 
@@ -61,13 +60,8 @@ public class IOUtils {
                 output.write(buffer, 0, n);
             }
             return output.toByteArray();
-
-//            byte[] byt = new byte[input.available()];
-//            input.read(byt);
-//            return byt;
         } finally {
-            output.close();
-            input.close();
+            close(output, input);
         }
     }
 
@@ -111,6 +105,11 @@ public class IOUtils {
         }
     }
 
+    /**
+     * 删除整个目录
+     *
+     * @param dir
+     */
     public static void delete(File dir) {
         if (!dir.exists()) {
             return;
@@ -126,6 +125,14 @@ public class IOUtils {
         dir.delete();
     }
 
+    /**
+     * 复制输入输出流
+     *
+     * @param input
+     * @param output
+     * @return
+     * @throws IOException
+     */
     public static int copy(InputStream input, OutputStream output)
             throws IOException {
         byte[] buffer = new byte[4096];
@@ -138,12 +145,24 @@ public class IOUtils {
         return count;
     }
 
+    /**
+     * 计算cec
+     *
+     * @param bytes
+     * @return
+     */
     public static long crc32(byte[] bytes) {
         CRC32 crc = new CRC32();
         crc.update(bytes);
         return crc.getValue();
     }
 
+
+    /**
+     * 关闭流
+     *
+     * @param outs
+     */
     public static void close(Closeable... outs) {
         if (outs != null) {
             for (Closeable out : outs) {

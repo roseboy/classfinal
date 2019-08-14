@@ -124,9 +124,9 @@ public class EncryptUtils {
             for (String classname : classNames) {
                 String classPath = encryptPath + File.separator + classname.replace(".", File.separator) + ".class";
                 File sourceFile = new File(classPath);
-                byte[] bytes = IOUtils.readFileToByte(sourceFile);
+                byte[] bytes = IoUtils.readFileToByte(sourceFile);
                 bytes = en(bytes, password);
-                IOUtils.writeFile(new File(encryptPath + File.separator + classname.replace(".", File.separator) + ".clazz"), bytes);
+                IoUtils.writeFile(new File(encryptPath + File.separator + classname.replace(".", File.separator) + ".clazz"), bytes);
             }
             return;
         }
@@ -141,7 +141,7 @@ public class EncryptUtils {
                 File sourceFile = new File(classPath);
 
                 zos.putNextEntry(new ZipEntry(classname));
-                byte[] bytes = IOUtils.readFileToByte(sourceFile);
+                byte[] bytes = IoUtils.readFileToByte(sourceFile);
                 bytes = en(bytes, password);
                 zos.write(bytes, 0, bytes.length);
                 zos.closeEntry();
@@ -149,7 +149,7 @@ public class EncryptUtils {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            IOUtils.close(zos, out);
+            IoUtils.close(zos, out);
         }
     }
 
@@ -173,7 +173,7 @@ public class EncryptUtils {
             if (!file.exists()) {
                 return null;
             }
-            byte[] bytes = IOUtils.readFileToByte(file);
+            byte[] bytes = IoUtils.readFileToByte(file);
             bytes = de(bytes, password);
             return bytes;
         }
@@ -190,13 +190,13 @@ public class EncryptUtils {
                 return null;
             }
             InputStream is = zipFile.getInputStream(zipEntry);
-            byte[] bytes = IOUtils.toByteArray(is);
+            byte[] bytes = IoUtils.toByteArray(is);
             bytes = de(bytes, password);
             return bytes;
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            IOUtils.close(zipFile);
+            IoUtils.close(zipFile);
         }
         return null;
     }

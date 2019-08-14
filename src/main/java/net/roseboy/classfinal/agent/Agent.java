@@ -1,7 +1,7 @@
 package net.roseboy.classfinal.agent;
 
 import net.roseboy.classfinal.Main;
-import net.roseboy.classfinal.util.IOUtils;
+import net.roseboy.classfinal.util.IoUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.instrument.Instrumentation;
-import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -20,7 +19,7 @@ import java.util.zip.ZipFile;
  * <p>
  * 配置 -javaagent:this.jar='-data classes1.dat,classes2.dat -pwd 123123,000000'
  * 启动jar  java -javaagent:this.jar='-data aa.jar -pwd 0000000' -jar aa.jar
- *
+ * <p>
  * java -javaagent:/Users/roseboy/code-space/agent/target/agent-1.0.jar='-data /Users/roseboy/work-yiyon/易用框架/yiyon-server-liuyuan/yiyon-package-liuyuan/target/yiyon-package-liuyuan-1.0.0-encrypted.jar -pwd 000000' -jar yiyon-package-liuyuan-1.0.0-encrypted.jar
  *
  * @author roseboy
@@ -69,17 +68,16 @@ public class Agent {
                     }
                     InputStream is = zipFile.getInputStream(zipEntry);
                     File classesDat = new File(files[i].substring(0, files[i].length() - 4) + "." + Main.FILE_NAME);
-                    IOUtils.writeFile(classesDat, IOUtils.toByteArray(is));
+                    IoUtils.writeFile(classesDat, IoUtils.toByteArray(is));
                     files[i] = classesDat.getAbsolutePath();
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
-                    IOUtils.close(zipFile);
+                    IoUtils.close(zipFile);
                 }
             }
         }
 
-        System.out.println(Arrays.toString(files));
         AgentTransformer tran = new AgentTransformer();
         tran.setFiles(files);
         tran.setPwds(pwds);
