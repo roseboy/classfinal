@@ -9,7 +9,6 @@ import java.security.ProtectionDomain;
  * jvm加载class时回调
  *
  * @author roseboy
- * @date 2019-08-02
  */
 public class AgentTransformer implements ClassFileTransformer {
 

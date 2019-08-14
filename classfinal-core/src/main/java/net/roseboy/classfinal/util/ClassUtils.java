@@ -13,7 +13,6 @@ import java.util.List;
  * 字节码操作工具类
  *
  * @author roseboy
- * @date 2019-08-15
  */
 public class ClassUtils {
 
@@ -22,6 +21,7 @@ public class ClassUtils {
      *
      * @param pool      javassist的ClassPool
      * @param classname 要修改的class全名
+     * @return 返回方法体的字节
      */
     public static byte[] rewriteMethod(ClassPool pool, String classname) {
         String name = null;

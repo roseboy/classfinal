@@ -3,7 +3,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
 
     <groupId>net.roseboy</groupId>
     <artifactId>classfinal</artifactId>
@@ -24,4 +28,24 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
     </properties>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://gitee.com/roseboy/classfinal.git</url>
+        <connection>https://gitee.com/roseboy/classfinal.git</connection>
+        <developerConnection>roseboy.net</developerConnection>
+    </scm>
+    <developers>
+        <developer>
+            <name>roseboy</name>
+            <email>roseboy@live.com</email>
+        </developer>
+    </developers>
+
 </project>

@@ -23,7 +23,6 @@ import java.util.zip.ZipOutputStream;
  * java class解密
  *
  * @author roseboy
- * @date 2019-08-15
  */
 public class JarDecryptor {
 

@@ -4,7 +4,6 @@ package net.roseboy.classfinal;
  * 常量
  *
  * @author roseboy
- * @date 2019-08-15
  */
 public class Constants {
 

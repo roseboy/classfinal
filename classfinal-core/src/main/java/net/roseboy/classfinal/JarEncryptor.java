@@ -20,7 +20,6 @@ import java.util.zip.ZipOutputStream;
  * java class加密
  *
  * @author roseboy
- * @date 2019-08-15
  */
 public class JarEncryptor {
 
@@ -66,6 +65,8 @@ public class JarEncryptor {
 
     /**
      * 加密jar的主要过程
+     *
+     * @return 解密后生成的文件的绝对路径
      */
     public String doEncryptJar() {
         if (!jarPath.endsWith(".jar") && !jarPath.endsWith(".war")) {
@@ -74,9 +75,9 @@ public class JarEncryptor {
         if (password == null || password.length() == 0) {
             throw new RuntimeException("密码不能为空");
         }
-        this.jarOrWar=jarPath.substring(jarPath.lastIndexOf(".") + 1);
+        this.jarOrWar = jarPath.substring(jarPath.lastIndexOf(".") + 1);
         //临时work目录
-        this.targetDir=jarPath.replace("." + jarOrWar, Constants.LIB_JAR_DIR);
+        this.targetDir = jarPath.replace("." + jarOrWar, Constants.LIB_JAR_DIR);
 
         //[1]释放所有文件，内部jar只释放需要加密的jar
         List<String> allFile = JarUtils.unJar(jarPath, targetDir, includeJars);
@@ -108,11 +109,11 @@ public class JarEncryptor {
      * @return 加密后文件的路径
      */
     public String doEncryptJar(String jarPath, String packages, List<String> includeJars, String excludeClass, String password) {
-        this.jarPath=jarPath;
-        this.packages=packages;
-        this.includeJars=includeJars;
-        this.excludeClass=excludeClass;
-        this.password=password;
+        this.jarPath = jarPath;
+        this.packages = packages;
+        this.includeJars = includeJars;
+        this.excludeClass = excludeClass;
+        this.password = password;
         return this.doEncryptJar();
     }
 

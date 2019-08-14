@@ -79,9 +79,9 @@ public class MainJar {
             //test数据
             if ("123123".equals(path)) {
                 //springboot jar
-                //path = "/Users/roseboy/work-yiyon/易用框架/yiyon-server-liuyuan/yiyon-package-liuyuan/target/yiyon-package-liuyuan-1.0.0.jar";
+                path = "/Users/roseboy/work-yiyon/易用框架/yiyon-server-liuyuan/yiyon-package-liuyuan/target/yiyon-package-liuyuan-1.0.0.jar";
                 //spring web war
-                path = "/Users/roseboy/work-yiyon/北大口腔/erpbeidakouqiang/target/erpbeidakouqiang-1.0.0.war";
+                //path = "/Users/roseboy/work-yiyon/北大口腔/erpbeidakouqiang/target/erpbeidakouqiang-1.0.0.war";
                 //fat jar
                 //path = "/Users/roseboy/code-space/agent/target/agent-1.0.jar";
 

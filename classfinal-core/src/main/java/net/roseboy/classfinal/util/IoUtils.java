@@ -8,7 +8,6 @@ import java.util.zip.CRC32;
  * 工具
  *
  * @author roseboy
- * @date 2019-08-15
  */
 public class IoUtils {
 
@@ -51,7 +50,7 @@ public class IoUtils {
      *
      * @param input 输入流
      * @return 字节
-     * @throws IOException
+     * @throws IOException IOException
      */
     public static byte[] toByteArray(InputStream input) throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -130,8 +129,8 @@ public class IoUtils {
     /**
      * 复制输入输出流
      *
-     * @param input
-     * @param output
+     * @param input 输入流
+     * @param output 输出流
      * @return 字节大小
      * @throws IOException IOException
      */
@@ -150,7 +149,7 @@ public class IoUtils {
     /**
      * 计算cec
      *
-     * @param bytes
+     * @param bytes 字节
      * @return crc值
      */
     public static long crc32(byte[] bytes) {

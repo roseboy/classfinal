@@ -7,7 +7,6 @@ import java.security.NoSuchAlgorithmException;
  * 简单加密解密
  *
  * @author roseboy
- * @date 2019-08-15
  */
 public class EncryptUtils {
     //盐
