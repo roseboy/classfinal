@@ -4,7 +4,6 @@ import javassist.*;
 import javassist.bytecode.*;
 import javassist.compiler.CompileError;
 import javassist.compiler.Javac;
-import net.roseboy.classfinal.Main;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,18 +13,18 @@ import java.util.List;
  * 字节码操作工具类
  *
  * @author roseboy
- * @date 2019-08-01
+ * @date 2019-08-15
  */
 public class ClassUtils {
 
     /**
      * 清空方法
      *
-     * @param pool
-     * @param classname
+     * @param pool      javassist的ClassPool
+     * @param classname 要修改的class全名
      */
     public static byte[] rewriteMethod(ClassPool pool, String classname) {
-        String name = "";
+        String name = null;
         try {
             CtClass cc = pool.getCtClass(classname);
             CtMethod[] methods = cc.getDeclaredMethods();
@@ -55,10 +54,10 @@ public class ClassUtils {
     /**
      * 修改方法体，并且保留参数信息
      *
-     * @param m
-     * @param src
-     * @param rebuild
-     * @throws CannotCompileException
+     * @param m       javassist的方法
+     * @param src     java代码
+     * @param rebuild 是否重新构建
+     * @throws CannotCompileException 编译异常
      */
     public static void setBodyKeepParamInfos(CtMethod m, String src, boolean rebuild) throws CannotCompileException {
         CtClass cc = m.getDeclaringClass();
@@ -108,9 +107,9 @@ public class ClassUtils {
     /**
      * 加载jar包路径
      *
-     * @param pool
-     * @param paths
-     * @throws NotFoundException
+     * @param pool  javassist的ClassPool
+     * @param paths lib路径，
+     * @throws NotFoundException NotFoundException
      */
     public static void loadClassPath(ClassPool pool, String[] paths) throws NotFoundException {
         for (String path : paths) {
@@ -128,9 +127,9 @@ public class ClassUtils {
     /**
      * 判断是否是某个包名
      *
-     * @param encryptPackage
-     * @param className
-     * @return
+     * @param encryptPackage 允许的包名，多个用逗号隔开
+     * @param className      要判断的类名
+     * @return 是否属于
      */
     public static boolean isPackage(String encryptPackage, String className) {
         if (encryptPackage == null || encryptPackage.length() == 0) {
@@ -140,46 +139,6 @@ public class ClassUtils {
         String[] packages = encryptPackage.split(",");
         for (String pkg : packages) {
             if (className.startsWith(pkg)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 根据类名和jar名还原真是路径
-     *
-     * @param jar
-     * @param className
-     * @return
-     */
-    public static String realPath(String jar, String className, String warOrJar) {
-        String path;
-        String inf = "jar".equals(warOrJar) ? "BOOT-INF" : "WEB-INF";
-        if ("ROOT".equals(jar)) {
-            path = "";
-        } else if ("CLASSES".equals(jar)) {
-            path = inf + File.separator + "classes";
-        } else {
-            path = inf + File.separator + "lib" + File.separator + jar + Main.LIB_JAR_DIR;
-        }
-        if (className == null || className.length() == 0) {
-            return path;
-        }
-        path = path + (path.length() == 0 ? "" : File.separator) + className.replace(".", File.separator) + ".class";
-        return path;
-    }
-
-    /**
-     * 是否垃圾文件
-     *
-     * @param file
-     * @return
-     */
-    public static boolean isDel(File file) {
-        String[] dels = {".DS_Store", "Thumbs.db"};
-        for (String f : dels) {
-            if (file.getAbsolutePath().endsWith(f)) {
                 return true;
             }
         }

@@ -6,15 +6,17 @@ import java.util.zip.CRC32;
 
 /**
  * 工具
+ *
  * @author roseboy
+ * @date 2019-08-15
  */
 public class IoUtils {
 
     /**
      * 写文件
      *
-     * @param file
-     * @param fileBytes
+     * @param file      文件
+     * @param fileBytes 字节
      */
     public static void writeFile(File file, byte[] fileBytes) {
         OutputStream os = null;
@@ -31,8 +33,8 @@ public class IoUtils {
     /**
      * 读取文件
      *
-     * @param file
-     * @return
+     * @param file 文件
+     * @return 字节
      */
     public static byte[] readFileToByte(File file) {
         try {
@@ -47,8 +49,8 @@ public class IoUtils {
     /**
      * stream2byte[]
      *
-     * @param input
-     * @return
+     * @param input 输入流
+     * @return 字节
      * @throws IOException
      */
     public static byte[] toByteArray(InputStream input) throws IOException {
@@ -66,22 +68,22 @@ public class IoUtils {
     }
 
     /**
-     * 递归查找文件
+     * 递归查找文件，只返回文件
      *
-     * @param classes
-     * @param dir
-     * @param endWith
+     * @param fileList 返回的文件列表
+     * @param dir      目录
+     * @param endWith  文件后缀
      */
-    public static void listFile(List<File> classes, File dir, String endWith) {
+    public static void listFile(List<File> fileList, File dir, String endWith) {
         if (!dir.exists()) {
             throw new IllegalArgumentException("目录[" + dir.getAbsolutePath() + "]不存在");
         }
         File[] files = dir.listFiles();
         for (File f : files) {
             if (f.isDirectory()) {
-                listFile(classes, f, endWith);
+                listFile(fileList, f, endWith);
             } else if (f.isFile() && f.getName().endsWith(endWith)) {
-                classes.add(f);
+                fileList.add(f);
             }
         }
     }
@@ -89,8 +91,8 @@ public class IoUtils {
     /**
      * 枚举所有文件，包括文件夹
      *
-     * @param filess
-     * @param dir
+     * @param filess 返回的文件列表
+     * @param dir    目录
      */
     public static void listFile(List<File> filess, File dir) {
         if (!dir.exists()) {
@@ -108,7 +110,7 @@ public class IoUtils {
     /**
      * 删除整个目录
      *
-     * @param dir
+     * @param dir 目录
      */
     public static void delete(File dir) {
         if (!dir.exists()) {
@@ -130,8 +132,8 @@ public class IoUtils {
      *
      * @param input
      * @param output
-     * @return
-     * @throws IOException
+     * @return 字节大小
+     * @throws IOException IOException
      */
     public static int copy(InputStream input, OutputStream output)
             throws IOException {
@@ -149,7 +151,7 @@ public class IoUtils {
      * 计算cec
      *
      * @param bytes
-     * @return
+     * @return crc值
      */
     public static long crc32(byte[] bytes) {
         CRC32 crc = new CRC32();
@@ -161,7 +163,7 @@ public class IoUtils {
     /**
      * 关闭流
      *
-     * @param outs
+     * @param outs Closeable
      */
     public static void close(Closeable... outs) {
         if (outs != null) {

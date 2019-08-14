@@ -1,18 +1,13 @@
-package net.roseboy.classfinal.agent;
+package net.roseboy.classfinal;
 
-import net.roseboy.classfinal.Main;
-import net.roseboy.classfinal.util.IoUtils;
+import net.roseboy.classfinal.util.JarUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.instrument.Instrumentation;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * 监听类加载
@@ -26,8 +21,9 @@ import java.util.zip.ZipFile;
  * @date 2019-08-02
  */
 public class Agent {
+
     public static void premain(String args, Instrumentation inst) throws Exception {
-        Main.printDog();
+        Constants.printDog();
 
         Options options = new Options();
         options.addOption("data", true, "加密后的文件(多个用,分割)");
@@ -52,35 +48,16 @@ public class Agent {
         if (files.length != pwds.length) {
             throw new RuntimeException("加密文件和密码个数不一致");
         }
+
         for (int i = 0; i < files.length; i++) {
             //解压出classes.dat
             if (files[i].endsWith(".jar") || files[i].endsWith(".war")) {
-                ZipFile zipFile = null;
-                try {
-                    File zip = new File(files[i]);
-                    if (!zip.exists()) {
-                        continue;
-                    }
-                    zipFile = new ZipFile(zip);
-                    ZipEntry zipEntry = zipFile.getEntry(Main.FILE_NAME);
-                    if (zipEntry == null) {
-                        continue;
-                    }
-                    InputStream is = zipFile.getInputStream(zipEntry);
-                    File classesDat = new File(files[i].substring(0, files[i].length() - 4) + "." + Main.FILE_NAME);
-                    IoUtils.writeFile(classesDat, IoUtils.toByteArray(is));
-                    files[i] = classesDat.getAbsolutePath();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    IoUtils.close(zipFile);
-                }
+                File classesDat = new File(files[i].substring(0, files[i].length() - 4) + "." + Constants.FILE_NAME);
+                files[i] = JarUtils.getFileFromJar(new File(files[i]), Constants.FILE_NAME, classesDat);
             }
         }
 
-        AgentTransformer tran = new AgentTransformer();
-        tran.setFiles(files);
-        tran.setPwds(pwds);
+        AgentTransformer tran = new AgentTransformer(files, pwds);
         inst.addTransformer(tran);
     }
 
