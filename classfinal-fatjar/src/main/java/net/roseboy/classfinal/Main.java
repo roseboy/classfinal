@@ -1,6 +1,7 @@
 package net.roseboy.classfinal;
 
 
+import net.roseboy.classfinal.util.StrUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -18,9 +19,13 @@ import java.util.Scanner;
  * 启动2 java -jar this.jar -file springboot.jar -libjars a.jar,b.jar -packages net.roseboy,yiyon.com -exclude org.spring -pwd 995800 -Y
  *
  * @author roseboy
- * @date 2019-08-05
  */
-public class MainJar {
+public class Main {
+    /**
+     * 入口方法
+     *
+     * @param args 参数
+     */
     public static void main(String[] args) {
         Constants.pringInfo();
 
@@ -116,15 +121,15 @@ public class MainJar {
             }
 
             if ("Y".equals(yes)) {
-                List<String> includeJars = new ArrayList<>();
-                includeJars.add("-");
-                if (libjars != null && libjars.length() > 0) {
-                    includeJars.addAll(Arrays.asList(libjars.split(",")));
-                }
+                List<String> includeJarList = StrUtils.toList(libjars);
+                List<String> packageList = StrUtils.toList(packages);
+                List<String> excludeClassList = StrUtils.toList(excludeClass);
+                includeJarList.add("-");
+
                 //加密过程
                 System.out.println("处理中...");
                 JarEncryptor decryptor = new JarEncryptor();
-                String result = decryptor.doEncryptJar(path, packages, includeJars, excludeClass, password);
+                String result = decryptor.doEncryptJar(path, password, packageList, includeJarList, excludeClassList);
                 System.out.println("加密完成，请牢记密码！");
                 System.out.println(result);
             } else {
@@ -139,7 +144,7 @@ public class MainJar {
     /**
      * cmd 参数
      *
-     * @return
+     * @return CommandLine
      */
     public static CommandLine getCmdOptions(String[] args) {
         CommandLine cmd = null;

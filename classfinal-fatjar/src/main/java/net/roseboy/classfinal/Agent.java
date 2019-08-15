@@ -18,10 +18,15 @@ import java.lang.instrument.Instrumentation;
  * java -javaagent:/Users/roseboy/code-space/agent/target/agent-1.0.jar='-data /Users/roseboy/work-yiyon/易用框架/yiyon-server-liuyuan/yiyon-package-liuyuan/target/yiyon-package-liuyuan-1.0.0-encrypted.jar -pwd 000000' -jar yiyon-package-liuyuan-1.0.0-encrypted.jar
  *
  * @author roseboy
- * @date 2019-08-02
  */
 public class Agent {
 
+    /**
+     * man方法执行前调用
+     * @param args 参数
+     * @param inst inst
+     * @throws Exception Exception
+     */
     public static void premain(String args, Instrumentation inst) throws Exception {
         Constants.printDog();
 

@@ -131,13 +131,12 @@ public class ClassUtils {
      * @param className      要判断的类名
      * @return 是否属于
      */
-    public static boolean isPackage(String encryptPackage, String className) {
-        if (encryptPackage == null || encryptPackage.length() == 0) {
+    public static boolean isPackage(List<String> encryptPackage, String className) {
+        if (encryptPackage == null || encryptPackage.size() == 0) {
             return false;
         }
 
-        String[] packages = encryptPackage.split(",");
-        for (String pkg : packages) {
+        for (String pkg : encryptPackage) {
             if (className.startsWith(pkg)) {
                 return true;
             }

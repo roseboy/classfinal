@@ -26,11 +26,11 @@ public class JarEncryptor {
     //要加密的jar或war
     private String jarPath = null;
     //要加密的包，多个用逗号隔开
-    private String packages = null;
+    private List<String> packages = null;
     //-INF/lib下要加密的jar
     private List<String> includeJars = null;
     //排除的类名
-    private String excludeClass = null;
+    private List<String> excludeClass = null;
     //密码
     private String password = null;
     //jar还是war
@@ -54,7 +54,7 @@ public class JarEncryptor {
      * @param excludeClass 排除的类名
      * @param password     密码
      */
-    public JarEncryptor(String jarPath, String packages, List<String> includeJars, String excludeClass, String password) {
+    public JarEncryptor(String jarPath, String password, List<String> packages, List<String> includeJars, List<String> excludeClass) {
         super();
         this.jarPath = jarPath;
         this.packages = packages;
@@ -102,13 +102,13 @@ public class JarEncryptor {
      * 加密jar的主要过程
      *
      * @param jarPath      要加密的jar或war
-     * @param packages     要加密的包，多个用逗号隔开
+     * @param packages     要加密的包
      * @param includeJars  -INF/lib下要加密的jar
      * @param excludeClass 排除的类名
      * @param password     密码
      * @return 加密后文件的路径
      */
-    public String doEncryptJar(String jarPath, String packages, List<String> includeJars, String excludeClass, String password) {
+    public String doEncryptJar(String jarPath, String password, List<String> packages, List<String> includeJars, List<String> excludeClass) {
         this.jarPath = jarPath;
         this.packages = packages;
         this.includeJars = includeJars;
@@ -155,7 +155,7 @@ public class JarEncryptor {
             }
 
             //判断是否是需要加密的包，是不是排除的类
-            if (ClassUtils.isPackage(packages, clsName) && (excludeClass == null || excludeClass.length() == 0 || !excludeClass.contains(clsName))) {
+            if (ClassUtils.isPackage(packages, clsName) && (excludeClass == null || excludeClass.size() == 0 || !excludeClass.contains(clsName))) {
                 List<String> jarCls = jarClasses.get(jarName);
                 jarCls = jarCls == null ? new ArrayList<>() : jarCls;
                 jarCls.add(clsName);

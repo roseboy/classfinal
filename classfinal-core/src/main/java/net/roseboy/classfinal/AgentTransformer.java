@@ -2,6 +2,7 @@ package net.roseboy.classfinal;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
+import java.util.Arrays;
 
 
 /**
@@ -21,13 +22,14 @@ public class AgentTransformer implements ClassFileTransformer {
 
     /**
      * 构造方法
+     *
      * @param files 加密后产生的dat文件，多个
      * @param pwds  密码，多个，与fiels一一对应
      */
     public AgentTransformer(String[] files, String[] pwds) {
         this.files = files;
         this.pwds = pwds;
-        decryptor = new JarDecryptor(files, pwds);
+        decryptor = new JarDecryptor(Arrays.asList(files), Arrays.asList(pwds));
     }
 
     @Override

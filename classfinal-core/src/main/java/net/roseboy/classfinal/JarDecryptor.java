@@ -27,9 +27,9 @@ import java.util.zip.ZipOutputStream;
 public class JarDecryptor {
 
     //加密后的jar或war或加密产生的calsses.dat文件
-    private String[] files = null;//加密后生成的文件路径
+    private List<String> files = null;//加密后生成的文件路径
     //解密密码
-    private String[] pwds = null;//密码
+    private List<String> pwds = null;//密码
 
     /**
      * 构造方法
@@ -44,7 +44,7 @@ public class JarDecryptor {
      * @param files 加密后产生的dat文件，多个
      * @param pwds  密码，多个，与fiels一一对应
      */
-    public JarDecryptor(String[] files, String[] pwds) {
+    public JarDecryptor(List<String> files, List<String> pwds) {
         super();
         this.files = files;
         this.pwds = pwds;
@@ -58,9 +58,9 @@ public class JarDecryptor {
      */
     public byte[] doDecrypt(String className) {
         //遍历所有的文件
-        for (int i = 0; i < files.length; i++) {
-            String file = files[i];
-            String pwd = pwds[i];
+        for (int i = 0; i < files.size(); i++) {
+            String file = files.get(i);
+            String pwd = pwds.get(i);
 
             byte[] bytes = JarDecryptor.decryptFile(file, className, pwd);
             if (bytes != null) {
