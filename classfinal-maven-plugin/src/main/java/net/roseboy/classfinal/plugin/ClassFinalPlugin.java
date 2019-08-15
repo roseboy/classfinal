@@ -21,7 +21,7 @@ import java.util.List;
  * @author roseboy
  */
 @Mojo(name = "classFinal", defaultPhase = LifecyclePhase.PACKAGE)
-public class ClassFinal extends AbstractMojo {
+public class ClassFinalPlugin extends AbstractMojo {
 
     //MavenProject
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
@@ -59,8 +59,8 @@ public class ClassFinal extends AbstractMojo {
         includeJarList.add("-");
 
         //加密过程
-        JarEncryptor encryptor = new JarEncryptor();
-        String result = encryptor.doEncryptJar(targetjar, password, packageList, includeJarList, excludeClassList);
+        JarEncryptor encryptor = new JarEncryptor(targetjar, password, packageList, includeJarList, excludeClassList);
+        String result = encryptor.doEncryptJar();
         long t2 = System.currentTimeMillis();
 
         logger.info("Encrypt " + encryptor.getEncryptFileCount() + " classes");

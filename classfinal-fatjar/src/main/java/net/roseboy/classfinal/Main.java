@@ -30,38 +30,27 @@ public class Main {
         Constants.pringInfo();
 
         try {
-            //先接受参数
+            //先接收参数
             CommandLine cmd = getCmdOptions(args);
             if (cmd == null) {
                 return;
             }
 
-            String path = null;//需要加密的class路径
-            String packages = null; //包名
-            String libjars = null;
-            String excludeClass = null;//排除的class
-            String password = null;//密码
-
-            if (cmd.hasOption("file")) {
-                path = cmd.getOptionValue("file");
-            }
-            if (cmd.hasOption("libjars")) {
-                libjars = cmd.getOptionValue("libjars");
-            }
-            if (cmd.hasOption("packages")) {
-                packages = cmd.getOptionValue("packages");
-            }
-            if (cmd.hasOption("pwd")) {
-                password = cmd.getOptionValue("pwd");
-            }
-            if (cmd.hasOption("exclude")) {
-                excludeClass = cmd.getOptionValue("exclude");
-            }
+            //需要加密的class路径
+            String path = cmd.getOptionValue("file");
+            //lib下的jar
+            String libjars = cmd.getOptionValue("libjars");
+            //包名
+            String packages = cmd.getOptionValue("packages");
+            //排除的class
+            String excludeClass = cmd.getOptionValue("exclude");
+            //密码
+            String password = cmd.getOptionValue("pwd");
 
             //没有参数手动输入
             Scanner scanner = new Scanner(System.in);
             if (args == null || args.length == 0) {
-                while (path == null || path.length() == 0) {
+                while (StrUtils.isEmpty(path)) {
                     System.out.print("请输入需要加密的jar/war路径:");
                     path = scanner.nextLine();
                 }
@@ -75,7 +64,7 @@ public class Main {
                 System.out.print("请输入需要排除的类名(可为空,多个用\",\"分割):");
                 excludeClass = scanner.nextLine();
 
-                while (password == null || password.length() == 0) {
+                while (StrUtils.isEmpty(password)) {
                     System.out.print("请输入加密密码:");
                     password = scanner.nextLine();
                 }

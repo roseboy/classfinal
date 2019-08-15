@@ -34,7 +34,7 @@ public class StrUtils {
      * @param str 字符串
      * @return 是否是空的
      */
-    public boolean isEmpty(String str) {
+    public static boolean isEmpty(String str) {
         return str == null || str.length() == 0;
     }
 
@@ -44,7 +44,7 @@ public class StrUtils {
      * @param str 字符串
      * @return 是否不是空的
      */
-    public boolean isNotEmpty(String str) {
+    public static boolean isNotEmpty(String str) {
         return !isEmpty(str);
     }
 }

@@ -86,7 +86,7 @@ public class JarDecryptor {
         if (bytes == null) {
             return null;
         }
-        bytes = EncryptUtils.de(bytes, password + fileName);
+        bytes = EncryptUtils.deSimple(bytes, password + fileName);
         return bytes;
 
     }

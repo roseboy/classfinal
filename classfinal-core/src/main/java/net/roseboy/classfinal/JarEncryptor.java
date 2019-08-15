@@ -188,7 +188,7 @@ public class JarEncryptor {
                     File sourceFile = new File(classPath);
                     zos.putNextEntry(new ZipEntry(classname));
                     byte[] bytes = IoUtils.readFileToByte(sourceFile);
-                    bytes = EncryptUtils.en(bytes, password + classname);
+                    bytes = EncryptUtils.enSimple(bytes, password + classname);
                     zos.write(bytes, 0, bytes.length);
                     zos.closeEntry();
                     encryptClasses.add(classname);
