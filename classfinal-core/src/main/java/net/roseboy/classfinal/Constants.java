@@ -14,7 +14,7 @@ public class Constants {
     public static final String FILE_NAME = "classes.dat";
 
     //lib下的jar解压的目录名后缀
-    public static final String LIB_JAR_DIR = "_jar";
+    public static final String LIB_JAR_DIR = "_temp";
 
     public static void pringInfo() {
         System.out.println();

@@ -6,29 +6,26 @@ import org.apache.maven.model.Build;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * maven插件主类
+ * 加密jar/war文件的maven插件
  *
  * @author roseboy
  */
 @Mojo(name = "classFinal", defaultPhase = LifecyclePhase.PACKAGE)
 public class ClassFinal extends AbstractMojo {
 
-
     //MavenProject
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
-
     //密码
     @Parameter(property = "password", required = true)
     private String password;
@@ -49,21 +46,28 @@ public class ClassFinal extends AbstractMojo {
      * @throws MojoFailureException   MojoFailureException
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
+        Log logger = getLog();
         Build build = project.getBuild();
+
+        long t1 = System.currentTimeMillis();
+
         String targetjar = build.getDirectory() + File.separator + build.getFinalName() + "." + project.getPackaging();
-        getLog().info("加密jar: " + targetjar);
+        logger.info("Encrypting " + project.getPackaging() + " [" + targetjar + "]");
         List<String> includeJarList = StrUtils.toList(libjars);
         List<String> packageList = StrUtils.toList(packages);
         List<String> excludeClassList = StrUtils.toList(excludes);
         includeJarList.add("-");
 
         //加密过程
-        getLog().info("处理中...");
-        JarEncryptor decryptor = new JarEncryptor();
-        String result = decryptor.doEncryptJar(targetjar, password, packageList, includeJarList, excludeClassList);
-        getLog().info(result);
-        getLog().info("加密完成，请牢记密码！");
-        getLog().info("");
+        JarEncryptor encryptor = new JarEncryptor();
+        String result = encryptor.doEncryptJar(targetjar, password, packageList, includeJarList, excludeClassList);
+        long t2 = System.currentTimeMillis();
+
+        logger.info("Encrypt " + encryptor.getEncryptFileCount() + " classes");
+        logger.info("Encrypted " + project.getPackaging() + " [" + result + "]");
+        logger.info("Encrypt complete");
+        logger.info("Time [" + ((t2 - t1) / 1000d) + " s]");
+        logger.info("");
     }
 
 }

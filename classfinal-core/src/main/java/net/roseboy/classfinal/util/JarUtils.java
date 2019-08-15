@@ -151,14 +151,14 @@ public class JarUtils {
     }
 
     /**
-     * 在jar中根据文件名获取一个文件
+     * 在jar中根据文件名释放文件
      *
      * @param zip        压缩文件
      * @param fileName   文件名
      * @param targetFile 释放的目标文件
      * @return 释放出的文件的绝对路径
      */
-    public static String getFileFromJar(File zip, String fileName, File targetFile) {
+    public static String releaseFileFromJar(File zip, String fileName, File targetFile) {
         byte[] bytes = getFileFromJar(zip, fileName);
         if (bytes == null) {
             return null;

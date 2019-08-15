@@ -1,5 +1,6 @@
 package net.roseboy.classfinal;
 
+import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
@@ -39,6 +40,7 @@ public class AgentTransformer implements ClassFileTransformer {
             return classfileBuffer;
         }
 
+        className = className.replace(File.separator, ".");
         byte[] classByte = decryptor.doDecrypt(className);
         if (classByte != null) {
             return classByte;

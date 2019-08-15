@@ -37,6 +37,8 @@ public class JarEncryptor {
     private String jarOrWar = null;
     //工作目录
     private String targetDir = null;
+    //加密的文件数量
+    private Integer encryptFileCount = null;
 
     /**
      * 构造方法
@@ -86,7 +88,8 @@ public class JarEncryptor {
         Map<String, List<String>> jarClasses = groupByJarName(allFile);
 
         //[3]将正常的class加密，压缩另存
-        encryptClass(jarClasses);
+        List<String> encryptClass = encryptClass(jarClasses);
+        encryptFileCount = encryptClass.size();
 
         //[4]修改class方法体，并保存文件
         clearClassMethod(jarClasses);
@@ -166,15 +169,18 @@ public class JarEncryptor {
     }
 
     /**
-     * 加密class文件并压缩成一个文件
+     * 加密class文件并压缩成一个文件，放在META-INF里
      *
      * @param jarClasses 分组好的jar和jar下的class
+     * @return 已经加密的类名
      */
-    private void encryptClass(Map<String, List<String>> jarClasses) {
+    private List<String> encryptClass(Map<String, List<String>> jarClasses) {
+        //已经加密的类名
+        List<String> encryptClasses = new ArrayList<>();
         ZipOutputStream zos = null;
         FileOutputStream out = null;
         try {
-            out = new FileOutputStream(new File(targetDir + File.separator + Constants.FILE_NAME));
+            out = new FileOutputStream(new File(targetDir + File.separator + "META-INF" + File.separator + Constants.FILE_NAME));
             zos = new ZipOutputStream(out);
             for (Map.Entry<String, List<String>> entry : jarClasses.entrySet()) {
                 for (String classname : entry.getValue()) {
@@ -182,9 +188,10 @@ public class JarEncryptor {
                     File sourceFile = new File(classPath);
                     zos.putNextEntry(new ZipEntry(classname));
                     byte[] bytes = IoUtils.readFileToByte(sourceFile);
-                    bytes = EncryptUtils.en(bytes, password);
+                    bytes = EncryptUtils.en(bytes, password + classname);
                     zos.write(bytes, 0, bytes.length);
                     zos.closeEntry();
+                    encryptClasses.add(classname);
                 }
             }
         } catch (Exception e) {
@@ -192,6 +199,7 @@ public class JarEncryptor {
         } finally {
             IoUtils.close(zos, out);
         }
+        return encryptClasses;
     }
 
     /**
@@ -212,7 +220,7 @@ public class JarEncryptor {
                 pool.insertClassPath(targetDir + File.separator + realPath(entry.getKey(), null, jarOrWar));
                 //修改class方法体，并保存文件
                 for (String classname : entry.getValue()) {
-                    byte[] bts = ClassUtils.rewriteMethod(pool, classname);
+                    byte[] bts = ClassUtils.rewriteAllMethods(pool, classname);
                     if (bts != null) {
                         String path = targetDir + File.separator + realPath(entry.getKey(), classname, jarOrWar);
                         IoUtils.writeFile(new File(path), bts);
@@ -283,4 +291,12 @@ public class JarEncryptor {
         return path;
     }
 
+    /**
+     * 获取加密的文件数量
+     *
+     * @return 数量
+     */
+    public Integer getEncryptFileCount() {
+        return encryptFileCount;
+    }
 }

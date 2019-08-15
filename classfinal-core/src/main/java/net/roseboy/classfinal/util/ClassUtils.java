@@ -23,7 +23,7 @@ public class ClassUtils {
      * @param classname 要修改的class全名
      * @return 返回方法体的字节
      */
-    public static byte[] rewriteMethod(ClassPool pool, String classname) {
+    public static byte[] rewriteAllMethods(ClassPool pool, String classname) {
         String name = null;
         try {
             CtClass cc = pool.getCtClass(classname);

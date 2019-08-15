@@ -23,6 +23,7 @@ public class Agent {
 
     /**
      * man方法执行前调用
+     *
      * @param args 参数
      * @param inst inst
      * @throws Exception Exception
@@ -55,10 +56,14 @@ public class Agent {
         }
 
         for (int i = 0; i < files.length; i++) {
-            //解压出classes.dat
-            if (files[i].endsWith(".jar") || files[i].endsWith(".war")) {
+            //jar解压出classes.dat
+            if (files[i].endsWith(".jar")) {
                 File classesDat = new File(files[i].substring(0, files[i].length() - 4) + "." + Constants.FILE_NAME);
-                files[i] = JarUtils.getFileFromJar(new File(files[i]), Constants.FILE_NAME, classesDat);
+                files[i] = JarUtils.releaseFileFromJar(new File(files[i]), "META-INF" + File.separator + Constants.FILE_NAME, classesDat);
+            }
+            //war tomcat会自动解压，在META-INF下找classes.dat
+            else if (files[i].endsWith(".war")) {
+                files[i] = files[i].substring(0, files[i].length() - 4) + File.separator + "META-INF" + File.separator + Constants.FILE_NAME;
             }
         }
 
