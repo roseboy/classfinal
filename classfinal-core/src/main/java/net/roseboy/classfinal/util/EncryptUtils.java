@@ -250,12 +250,15 @@ public class EncryptUtils {
         return out;
     }
 
+    /**
+     * 生成密钥对
+     *
+     * @return 密钥信息
+     * @throws NoSuchAlgorithmException NoSuchAlgorithmException
+     */
     public static Map<Integer, String> genKeyPair() throws NoSuchAlgorithmException {
-        // KeyPairGenerator类用于生成公钥和私钥对，基于RSA算法生成对象
         KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
-        // 初始化密钥对生成器，密钥大小为96-1024位
         keyPairGen.initialize(KEY_LENGTH, new SecureRandom());
-        // 生成一个密钥对，保存在keyPair中
         KeyPair keyPair = keyPairGen.generateKeyPair();
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();   // 得到私钥
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();  // 得到公钥
@@ -273,6 +276,12 @@ public class EncryptUtils {
         return keyMap;
     }
 
+    /**
+     * 加密测试
+     *
+     * @param args 参数
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         //生成公钥和私钥
         Map<Integer, String> keyMap = genKeyPair();

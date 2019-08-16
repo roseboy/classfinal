@@ -1,15 +1,14 @@
 package net.roseboy.classfinal.util;
 
 import net.roseboy.classfinal.Constants;
-import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
-import org.apache.commons.compress.archivers.jar.JarArchiveInputStream;
-import org.apache.commons.compress.archivers.jar.JarArchiveOutputStream;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 /**
  * jar/war操作工具类
@@ -17,7 +16,6 @@ import java.util.zip.ZipFile;
  * @author roseboy
  */
 public class JarUtils {
-
 
     /**
      * 把目录压缩成jar
@@ -31,7 +29,7 @@ public class JarUtils {
         List<File> files = new ArrayList<>();
         IoUtils.listFile(files, new File(jarDir));
 
-        JarArchiveOutputStream jos = null;
+        ZipOutputStream zos = null;
         OutputStream out = null;
 
         try {
@@ -41,7 +39,7 @@ public class JarUtils {
             }
 
             out = new FileOutputStream(jar);
-            jos = new JarArchiveOutputStream(out);
+            zos = new ZipOutputStream(out);
 
             for (File file : files) {
                 if (isDel(file)) {
@@ -51,39 +49,38 @@ public class JarUtils {
                 fileName = fileName.startsWith(File.separator) ? fileName.substring(1) : fileName;
                 if (file.isDirectory()) {
                     //目录，添加一个目录entry
-                    JarArchiveEntry je = new JarArchiveEntry(fileName + File.separator);
-                    je.setTime(System.currentTimeMillis());
-                    jos.putArchiveEntry(je);
-                    jos.closeArchiveEntry();
+                    ZipEntry ze = new ZipEntry(fileName + File.separator);
+                    ze.setTime(System.currentTimeMillis());
+                    zos.putNextEntry(ze);
+                    zos.closeEntry();
                 } else if (fileName.endsWith(".jar")) {
                     //jar文件，需要写crc信息
                     byte[] bytes = IoUtils.readFileToByte(file);
-                    JarArchiveEntry je = new JarArchiveEntry(fileName);
-                    je.setMethod(JarArchiveEntry.STORED);
-                    je.setSize(bytes.length);
-                    je.setTime(System.currentTimeMillis());
-                    je.setCrc(IoUtils.crc32(bytes));
-                    jos.putArchiveEntry(je);
-                    jos.write(bytes);
-                    jos.closeArchiveEntry();
+                    ZipEntry ze = new ZipEntry(fileName);
+                    ze.setMethod(ZipEntry.STORED);
+                    ze.setSize(bytes.length);
+                    ze.setTime(System.currentTimeMillis());
+                    ze.setCrc(IoUtils.crc32(bytes));
+                    zos.putNextEntry(ze);
+                    zos.write(bytes);
+                    zos.closeEntry();
                 } else {
                     //其他文件直接写入
-                    JarArchiveEntry je = new JarArchiveEntry(fileName);
-                    je.setTime(System.currentTimeMillis());
-                    jos.putArchiveEntry(je);
+                    ZipEntry ze = new ZipEntry(fileName);
+                    ze.setTime(System.currentTimeMillis());
+                    zos.putNextEntry(ze);
                     byte[] bytes = IoUtils.readFileToByte(file);
-                    jos.write(bytes);
-                    jos.closeArchiveEntry();
+                    zos.write(bytes);
+                    zos.closeEntry();
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            IoUtils.close(jos);
+            IoUtils.close(zos);
         }
         return targetJar;
     }
-
 
     /**
      * 释放jar内以及子jar的所有文件
@@ -103,49 +100,42 @@ public class JarUtils {
             targetDirs.mkdirs();
         }
 
-        JarArchiveInputStream jis = null;
         FileInputStream fin = null;
+        ZipFile zipFile = null;
         try {
-            fin = new FileInputStream(new File(jarPath));
-            jis = new JarArchiveInputStream(fin);
-
-            JarArchiveEntry jarEntry;
-            while ((jarEntry = jis.getNextJarEntry()) != null) {
-                list.add(targetDir + File.separator + jarEntry.getName());
-
+            zipFile = new ZipFile(new File(jarPath));
+            Enumeration<?> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = (ZipEntry) entries.nextElement();
+                list.add(targetDir + File.separator + entry.getName());
                 //释放jar文件，如果在includeJars中，递归释放jar内的文件
-                if (jarEntry.getName().endsWith(".jar")) {
-                    ByteArrayOutputStream jos0 = new ByteArrayOutputStream();
-                    IoUtils.copy(jis, jos0);
-                    byte[] bytes = jos0.toByteArray();
-                    IoUtils.writeFile(new File(targetDir + File.separator + jarEntry.getName()), bytes);
-                    String jarName = jarEntry.getName().replace("BOOT-INF" + File.separator + "lib" + File.separator, "");
+                if (entry.getName().endsWith(".jar")) {
+                    byte[] bytes = IoUtils.toByteArray(zipFile.getInputStream(entry));
+                    IoUtils.writeFile(new File(targetDir + File.separator + entry.getName()), bytes);
+                    String jarName = entry.getName().replace("BOOT-INF" + File.separator + "lib" + File.separator, "");
                     jarName = jarName.replace("WEB-INF" + File.separator + "lib" + File.separator, "");
                     if (includeJars == null || includeJars.size() == 0 || includeJars.contains(jarName)) {
-                        String targetPath0 = targetDir + File.separator + jarEntry.getName();
-                        String targetDir0 = targetDir + File.separator + jarEntry.getName().replace(".jar", Constants.LIB_JAR_DIR);
+                        String targetPath0 = targetDir + File.separator + entry.getName();
+                        String targetDir0 = targetDir + File.separator + entry.getName().replace(".jar", Constants.LIB_JAR_DIR);
                         List<String> list0 = unJar(targetPath0, targetDir0, includeJars);
                         list.addAll(list0);
                     }
-
-                } else if (jarEntry.isDirectory()) {
+                } else if (entry.isDirectory()) {
                     //如果是目录，创建目录
-                    File dir = new File(targetDir + File.separator + jarEntry.getName());
+                    File dir = new File(targetDir + File.separator + entry.getName());
                     if (!dir.exists()) {
                         dir.mkdirs();
                     }
                 } else {
                     //其他文件，直接释放
-                    ByteArrayOutputStream jos0 = new ByteArrayOutputStream();
-                    IoUtils.copy(jis, jos0);
-                    byte[] bytes = jos0.toByteArray();
-                    IoUtils.writeFile(new File(targetDir + File.separator + jarEntry.getName()), bytes);
+                    byte[] bytes = IoUtils.toByteArray(zipFile.getInputStream(entry));
+                    IoUtils.writeFile(new File(targetDir + File.separator + entry.getName()), bytes);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            IoUtils.close(jis, fin);
+            IoUtils.close(zipFile, fin);
         }
         return list;
     }
