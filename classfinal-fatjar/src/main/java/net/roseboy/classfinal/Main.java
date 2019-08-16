@@ -76,13 +76,11 @@ public class Main {
                 path = "/Users/roseboy/work-yiyon/易用框架/yiyon-server-liuyuan/yiyon-package-liuyuan/target/yiyon-package-liuyuan-1.0.0.jar";
                 //spring web war
                 //path = "/Users/roseboy/work-yiyon/北大口腔/erpbeidakouqiang/target/erpbeidakouqiang-1.0.0.war";
-                //fat jar
-                //path = "/Users/roseboy/code-space/agent/target/agent-1.0.jar";
 
                 libjars = "yiyon-basedata-1.0.0.jar,jeee-admin-1.0.0.jar,aspectjweaver-1.8.13.jar";
                 packages = "com.yiyon,net.roseboy,yiyon";//包名过滤
                 excludeClass = "org.spring";//排除的类
-                password = "000000";
+                password = "123456";
             }
 
 
@@ -117,8 +115,8 @@ public class Main {
 
                 //加密过程
                 System.out.println("处理中...");
-                JarEncryptor decryptor = new JarEncryptor();
-                String result = decryptor.doEncryptJar(path, password, packageList, includeJarList, excludeClassList);
+                JarEncryptor decryptor = new JarEncryptor(path, password, packageList, includeJarList, excludeClassList);
+                String result = decryptor.doEncryptJar();
                 System.out.println("加密完成，请牢记密码！");
                 System.out.println(result);
             } else {
@@ -138,15 +136,12 @@ public class Main {
     public static CommandLine getCmdOptions(String[] args) {
         CommandLine cmd = null;
         Options options = new Options();
-        options.addOption("classes", true, "加密的classes路径");
-        options.addOption("libs", true, "项目依赖的jar包目录(多个用\",\"分割)");
         options.addOption("packages", true, "加密的包名(可为空,多个用\",\"分割)");
         options.addOption("pwd", true, "加密密码");
         options.addOption("exclude", true, "排除的类名(可为空,多个用\",\"分割)");
         options.addOption("file", true, "加密的jar/war路径");
         options.addOption("libjars", true, "jar/war lib下的jar(多个用\",\"分割)");
         options.addOption("Y", false, "无需确认");
-        options.addOption("C", false, "加密class目录");
 
         try {
             CommandLineParser parser = new DefaultParser();
