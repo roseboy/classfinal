@@ -46,6 +46,7 @@ public class JarUtils {
                     continue;
                 }
                 String fileName = file.getAbsolutePath().substring(jarDir.length());
+                fileName = fileName.replace(File.separator, Constants.FILE_SEPARATOR);
                 fileName = fileName.startsWith(Constants.FILE_SEPARATOR) ? fileName.substring(1) : fileName;
                 if (file.isDirectory()) {
                     //目录，添加一个目录entry
@@ -77,7 +78,7 @@ public class JarUtils {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            IoUtils.close(zos);
+            IoUtils.close(zos, out);
         }
         return targetJar;
     }

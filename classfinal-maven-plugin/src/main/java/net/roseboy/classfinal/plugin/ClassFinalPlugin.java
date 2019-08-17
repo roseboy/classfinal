@@ -1,5 +1,6 @@
 package net.roseboy.classfinal.plugin;
 
+import net.roseboy.classfinal.Constants;
 import net.roseboy.classfinal.JarEncryptor;
 import net.roseboy.classfinal.util.StrUtils;
 import org.apache.maven.model.Build;
@@ -11,8 +12,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-
-import java.io.File;
 import java.util.List;
 
 /**

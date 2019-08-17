@@ -1,6 +1,5 @@
 package net.roseboy.classfinal;
 
-import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
@@ -30,7 +29,7 @@ public class AgentTransformer implements ClassFileTransformer {
     public AgentTransformer(String[] files, String[] pwds) {
         this.files = files;
         this.pwds = pwds;
-        decryptor = new JarDecryptor(Arrays.asList(files), Arrays.asList(pwds));
+        decryptor = new JarDecryptor(Arrays.asList(this.files), Arrays.asList(this.pwds));
     }
 
     @Override
