@@ -40,7 +40,7 @@ public class AgentTransformer implements ClassFileTransformer {
             return classfileBuffer;
         }
 
-        className = className.replace(File.separator, ".");
+        className = className.replace(Constants.FILE_SEPARATOR, ".");
         byte[] classByte = decryptor.doDecrypt(className);
         if (classByte != null) {
             return classByte;

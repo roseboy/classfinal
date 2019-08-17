@@ -16,6 +16,8 @@ public class Constants {
     //lib下的jar解压的目录名后缀
     public static final String LIB_JAR_DIR = "_temp";
 
+    public static final String FILE_SEPARATOR = "/";
+
     public static void pringInfo() {
         System.out.println();
         System.out.println("=========================================================");

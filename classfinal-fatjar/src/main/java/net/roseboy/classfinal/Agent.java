@@ -59,11 +59,11 @@ public class Agent {
             //jar解压出classes.dat
             if (files[i].endsWith(".jar")) {
                 File classesDat = new File(files[i].substring(0, files[i].length() - 4) + "." + Constants.FILE_NAME);
-                files[i] = JarUtils.releaseFileFromJar(new File(files[i]), "META-INF" + File.separator + Constants.FILE_NAME, classesDat);
+                files[i] = JarUtils.releaseFileFromJar(new File(files[i]), "META-INF" + Constants.FILE_SEPARATOR + Constants.FILE_NAME, classesDat);
             }
             //war tomcat会自动解压，在META-INF下找classes.dat
             else if (files[i].endsWith(".war")) {
-                files[i] = files[i].substring(0, files[i].length() - 4) + File.separator + "META-INF" + File.separator + Constants.FILE_NAME;
+                files[i] = files[i].substring(0, files[i].length() - 4) + Constants.FILE_SEPARATOR + "META-INF" + Constants.FILE_SEPARATOR + Constants.FILE_NAME;
             }
         }
 

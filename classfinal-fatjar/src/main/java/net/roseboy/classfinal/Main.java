@@ -7,8 +7,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -69,6 +67,7 @@ public class Main {
                     password = scanner.nextLine();
                 }
             }
+            scanner.close();
 
             //test数据
             if ("123123".equals(path)) {

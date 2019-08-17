@@ -51,7 +51,7 @@ public class ClassFinalPlugin extends AbstractMojo {
 
         long t1 = System.currentTimeMillis();
 
-        String targetjar = build.getDirectory() + File.separator + build.getFinalName() + "." + project.getPackaging();
+        String targetjar = build.getDirectory() + Constants.FILE_SEPARATOR + build.getFinalName() + "." + project.getPackaging();
         logger.info("Encrypting " + project.getPackaging() + " [" + targetjar + "]");
         List<String> includeJarList = StrUtils.toList(libjars);
         List<String> packageList = StrUtils.toList(packages);

@@ -280,7 +280,7 @@ public class EncryptUtils {
      * 加密测试
      *
      * @param args 参数
-     * @throws Exception
+     * @throws Exception Exception
      */
     public static void main(String[] args) throws Exception {
         //生成公钥和私钥

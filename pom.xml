@@ -11,7 +11,7 @@
 
     <groupId>net.roseboy</groupId>
     <artifactId>classfinal</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <modules>
         <module>classfinal-core</module><!--主要代码在这里-->
         <module>classfinal-fatjar</module><!--单独运行的jar、javaagent-->
@@ -48,4 +48,19 @@
         </developer>
     </developers>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>sonatype-nexus-staging</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

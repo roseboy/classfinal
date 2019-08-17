@@ -1,23 +1,10 @@
 package net.roseboy.classfinal;
 
-import javassist.ClassPool;
-import javassist.NotFoundException;
-import net.roseboy.classfinal.util.ClassUtils;
 import net.roseboy.classfinal.util.EncryptUtils;
-import net.roseboy.classfinal.util.IoUtils;
 import net.roseboy.classfinal.util.JarUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 /**
  * java class解密
