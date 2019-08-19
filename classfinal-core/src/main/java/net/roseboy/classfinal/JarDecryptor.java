@@ -24,9 +24,11 @@ public class JarDecryptor {
      */
     public byte[] doDecrypt(String encryptFile, String className, String password) {
         long t1 = System.currentTimeMillis();
-        String classFile = "META-INF" + Constants.FILE_SEPARATOR + Constants.FILE_NAME + Constants.FILE_SEPARATOR + className;
+
+        String classFile = "META-INF" + Const.FILE_SEPARATOR + Const.FILE_NAME + Const.FILE_SEPARATOR + className;
         File workDir = new File(encryptFile);
         byte[] bytes = null;
+
         if (workDir.isFile()) {
             bytes = JarUtils.getFileFromJar(workDir, classFile);
         } else {
@@ -39,8 +41,10 @@ public class JarDecryptor {
         if (bytes == null) {
             return null;
         }
+
         bytes = EncryptUtils.de(bytes, password + className, 1);
-        if (Constants.DEBUG) {
+
+        if (Const.DEBUG) {
             long t2 = System.currentTimeMillis();
             Log.debug("解密文件: " + className + " (" + (t2 - t1) + " ms)");
         }

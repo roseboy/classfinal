@@ -1,12 +1,10 @@
 package net.roseboy.classfinal;
 
-import net.roseboy.classfinal.util.JarUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 
-import java.io.File;
 import java.lang.instrument.Instrumentation;
 
 /**
@@ -27,7 +25,7 @@ public class Agent {
      * @throws Exception Exception
      */
     public static void premain(String args, Instrumentation inst) throws Exception {
-        Constants.printDog();
+        Const.printDog();
 
         Options options = new Options();
         options.addOption("pwd", true, "密码");
@@ -38,7 +36,7 @@ public class Agent {
             CommandLineParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(options, args.split(" "));
             pwd = cmd.getOptionValue("pwd");
-            Constants.DEBUG = cmd.hasOption("debug");
+            Const.DEBUG = cmd.hasOption("debug");
         }
 
         AgentTransformer tran = new AgentTransformer(pwd);

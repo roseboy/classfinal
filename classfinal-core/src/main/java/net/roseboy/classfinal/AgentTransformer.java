@@ -1,11 +1,8 @@
 package net.roseboy.classfinal;
 
-import net.roseboy.classfinal.util.Log;
-
 import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
-import java.util.Arrays;
 
 
 /**
@@ -46,7 +43,7 @@ public class AgentTransformer implements ClassFileTransformer {
             }
         }
 
-        className = className.replace(Constants.FILE_SEPARATOR, ".");
+        className = className.replace(Const.FILE_SEPARATOR, ".");
         className = className.replace(File.separator, ".");
 
         byte[] bytes = decryptor.doDecrypt(encryptFile, className, pwd);

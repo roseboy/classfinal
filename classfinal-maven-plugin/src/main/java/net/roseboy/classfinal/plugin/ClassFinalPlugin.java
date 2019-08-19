@@ -1,6 +1,6 @@
 package net.roseboy.classfinal.plugin;
 
-import net.roseboy.classfinal.Constants;
+import net.roseboy.classfinal.Const;
 import net.roseboy.classfinal.JarEncryptor;
 import net.roseboy.classfinal.util.StrUtils;
 import org.apache.maven.model.Build;
@@ -49,13 +49,13 @@ public class ClassFinalPlugin extends AbstractMojo {
      * @throws MojoFailureException   MojoFailureException
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
-        Constants.DEBUG = debug;
+        Const.DEBUG = debug;
         Log logger = getLog();
         Build build = project.getBuild();
 
         long t1 = System.currentTimeMillis();
 
-        String targetjar = build.getDirectory() + Constants.FILE_SEPARATOR + build.getFinalName() + "." + project.getPackaging();
+        String targetjar = build.getDirectory() + Const.FILE_SEPARATOR + build.getFinalName() + "." + project.getPackaging();
         logger.info("Encrypting " + project.getPackaging() + " [" + targetjar + "]");
         List<String> includeJarList = StrUtils.toList(libjars);
         List<String> packageList = StrUtils.toList(packages);

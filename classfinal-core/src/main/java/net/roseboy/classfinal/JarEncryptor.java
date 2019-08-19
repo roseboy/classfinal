@@ -76,11 +76,11 @@ public class JarEncryptor {
         }
         this.jarOrWar = jarPath.substring(jarPath.lastIndexOf(".") + 1);
         //临时work目录
-        this.targetDir = jarPath.replace("." + jarOrWar, Constants.LIB_JAR_DIR);
+        this.targetDir = jarPath.replace("." + jarOrWar, Const.LIB_JAR_DIR);
 
         //[1]释放所有文件，内部jar只释放需要加密的jar
         List<String> allFile = JarUtils.unJar(jarPath, targetDir, includeJars);
-        if (Constants.DEBUG) {
+        if (Const.DEBUG) {
             for (String file : allFile) {
                 Log.debug("释放文件：" + file);
             }
@@ -88,7 +88,7 @@ public class JarEncryptor {
 
         //[2]按照jar包名分组,只要需要加密的class文件
         Map<String, List<String>> jarClasses = groupByJarName(allFile);
-        if (Constants.DEBUG) {
+        if (Const.DEBUG) {
             for (Map.Entry<String, List<String>> entry : jarClasses.entrySet()) {
                 Log.debug("文件分组：" + entry.getKey() + "  [" + entry.getValue().size() + "]");
             }
@@ -97,7 +97,7 @@ public class JarEncryptor {
         //[3]将正常的class加密，压缩另存
         List<String> encryptClass = encryptClass2(jarClasses);
         encryptFileCount = encryptClass.size();
-        if (Constants.DEBUG) {
+        if (Const.DEBUG) {
             for (String s : encryptClass) {
                 Log.debug("加密文件：" + s);
             }
@@ -148,16 +148,16 @@ public class JarEncryptor {
                 continue;
             }
             file = file.replace(targetDir, "");
-            file = file.startsWith(Constants.FILE_SEPARATOR) ? file.substring(1) : file;
-            file = file.replace(Constants.FILE_SEPARATOR, ".");
+            file = file.startsWith(Const.FILE_SEPARATOR) ? file.substring(1) : file;
+            file = file.replace(Const.FILE_SEPARATOR, ".");
             file = file.substring(0, file.length() - 6);
             String jarName;
             String clsName;
-            if ((file.contains("BOOT-INF.lib") || file.contains("WEB-INF.lib")) && file.contains(Constants.LIB_JAR_DIR)) {
+            if ((file.contains("BOOT-INF.lib") || file.contains("WEB-INF.lib")) && file.contains(Const.LIB_JAR_DIR)) {
                 //lib的jar包内的
                 file = file.replace("BOOT-INF.lib.", "").replace("WEB-INF.lib.", "");
-                jarName = file.substring(0, file.indexOf(Constants.LIB_JAR_DIR));
-                clsName = file.substring(file.indexOf(Constants.LIB_JAR_DIR) + Constants.LIB_JAR_DIR.length() + 1);
+                jarName = file.substring(0, file.indexOf(Const.LIB_JAR_DIR));
+                clsName = file.substring(file.indexOf(Const.LIB_JAR_DIR) + Const.LIB_JAR_DIR.length() + 1);
             } else if (file.contains("BOOT-INF.classes") || file.contains("WEB-INF.classes")) {
                 //jar/war包-INF/classes下的class文件
                 file = file.replace("BOOT-INF.classes.", "").replace("WEB-INF.classes.", "");
@@ -192,11 +192,11 @@ public class JarEncryptor {
         ZipOutputStream zos = null;
         FileOutputStream out = null;
         try {
-            out = new FileOutputStream(new File(targetDir + Constants.FILE_SEPARATOR + "META-INF" + Constants.FILE_SEPARATOR + Constants.FILE_NAME));
+            out = new FileOutputStream(new File(targetDir + Const.FILE_SEPARATOR + "META-INF" + Const.FILE_SEPARATOR + Const.FILE_NAME));
             zos = new ZipOutputStream(out);
             for (Map.Entry<String, List<String>> entry : jarClasses.entrySet()) {
                 for (String classname : entry.getValue()) {
-                    String classPath = targetDir + Constants.FILE_SEPARATOR + realPath(entry.getKey(), classname, jarOrWar);
+                    String classPath = targetDir + Const.FILE_SEPARATOR + realPath(entry.getKey(), classname, jarOrWar);
                     File sourceFile = new File(classPath);
                     zos.putNextEntry(new ZipEntry(classname));
                     byte[] bytes = IoUtils.readFileToByte(sourceFile);
@@ -224,14 +224,14 @@ public class JarEncryptor {
         //已经加密的类名
         List<String> encryptClasses = new ArrayList<>();
 
-        File metaInfoClasses = new File(targetDir + Constants.FILE_SEPARATOR + "META-INF" + Constants.FILE_SEPARATOR + Constants.FILE_NAME);
+        File metaInfoClasses = new File(targetDir + Const.FILE_SEPARATOR + "META-INF" + Const.FILE_SEPARATOR + Const.FILE_NAME);
         if (!metaInfoClasses.exists()) {
             metaInfoClasses.mkdirs();
         }
 
         for (Map.Entry<String, List<String>> entry : jarClasses.entrySet()) {
             for (String classname : entry.getValue()) {
-                String classPath = targetDir + Constants.FILE_SEPARATOR + realPath(entry.getKey(), classname, jarOrWar);
+                String classPath = targetDir + Const.FILE_SEPARATOR + realPath(entry.getKey(), classname, jarOrWar);
                 File sourceFile = new File(classPath);
                 byte[] bytes = IoUtils.readFileToByte(sourceFile);
                 bytes = EncryptUtils.en(bytes, password + classname, 1);
@@ -251,7 +251,7 @@ public class JarEncryptor {
      * @throws NotFoundException NotFoundException
      */
     private void clearClassMethod(Map<String, List<String>> jarClasses) {
-        String libpath = targetDir + Constants.FILE_SEPARATOR + ("jar".equals(jarOrWar) ? "BOOT-INF" : "WEB-INF") + Constants.FILE_SEPARATOR + "lib" + Constants.FILE_SEPARATOR;
+        String libpath = targetDir + Const.FILE_SEPARATOR + ("jar".equals(jarOrWar) ? "BOOT-INF" : "WEB-INF") + Const.FILE_SEPARATOR + "lib" + Const.FILE_SEPARATOR;
         try {
             for (Map.Entry<String, List<String>> entry : jarClasses.entrySet()) {
                 //初始化javassist
@@ -259,12 +259,12 @@ public class JarEncryptor {
                 //lib目录
                 ClassUtils.loadClassPath(pool, new String[]{libpath});
                 //要修改的class所在的目录
-                pool.insertClassPath(targetDir + Constants.FILE_SEPARATOR + realPath(entry.getKey(), null, jarOrWar));
+                pool.insertClassPath(targetDir + Const.FILE_SEPARATOR + realPath(entry.getKey(), null, jarOrWar));
                 //修改class方法体，并保存文件
                 for (String classname : entry.getValue()) {
                     byte[] bts = ClassUtils.rewriteAllMethods(pool, classname);
                     if (bts != null) {
-                        String path = targetDir + Constants.FILE_SEPARATOR + realPath(entry.getKey(), classname, jarOrWar);
+                        String path = targetDir + Const.FILE_SEPARATOR + realPath(entry.getKey(), classname, jarOrWar);
                         IoUtils.writeFile(new File(path), bts);
                     }
                 }
@@ -281,18 +281,18 @@ public class JarEncryptor {
      */
     private String packageJar(Map<String, List<String>> jarClasses) {
         String jarOrWar = jarPath.substring(jarPath.lastIndexOf(".") + 1);
-        String libpath = targetDir + Constants.FILE_SEPARATOR + ("jar".equals(jarOrWar) ? "BOOT-INF" : "WEB-INF") + Constants.FILE_SEPARATOR + "lib" + Constants.FILE_SEPARATOR;
+        String libpath = targetDir + Const.FILE_SEPARATOR + ("jar".equals(jarOrWar) ? "BOOT-INF" : "WEB-INF") + Const.FILE_SEPARATOR + "lib" + Const.FILE_SEPARATOR;
 
         //[1]先打包lib下的jar
         for (Map.Entry<String, List<String>> entry : jarClasses.entrySet()) {
             if (!"CLASSES".equals(entry.getKey()) && !"ROOT".equals(entry.getKey())) {
-                JarUtils.doJar(libpath + entry.getKey() + Constants.LIB_JAR_DIR, libpath + entry.getKey() + ".jar");
+                JarUtils.doJar(libpath + entry.getKey() + Const.LIB_JAR_DIR, libpath + entry.getKey() + ".jar");
             }
         }
 
         //[2]删除内部jar解压出来的目录
         for (String file : includeJars) {
-            File dir = new File(libpath + file.replace(".jar", Constants.LIB_JAR_DIR));
+            File dir = new File(libpath + file.replace(".jar", Const.LIB_JAR_DIR));
             if (dir.exists()) {
                 IoUtils.delete(dir);
             }
@@ -322,14 +322,14 @@ public class JarEncryptor {
         if ("ROOT".equals(jar)) {
             path = "";
         } else if ("CLASSES".equals(jar)) {
-            path = inf + Constants.FILE_SEPARATOR + "classes";
+            path = inf + Const.FILE_SEPARATOR + "classes";
         } else {
-            path = inf + Constants.FILE_SEPARATOR + "lib" + Constants.FILE_SEPARATOR + jar + Constants.LIB_JAR_DIR;
+            path = inf + Const.FILE_SEPARATOR + "lib" + Const.FILE_SEPARATOR + jar + Const.LIB_JAR_DIR;
         }
         if (className == null || className.length() == 0) {
             return path;
         }
-        path = path + (path.length() == 0 ? "" : Constants.FILE_SEPARATOR) + className.replace(".", Constants.FILE_SEPARATOR) + ".class";
+        path = path + (path.length() == 0 ? "" : Const.FILE_SEPARATOR) + className.replace(".", Const.FILE_SEPARATOR) + ".class";
         return path;
     }
 

@@ -25,7 +25,7 @@ public class Main {
      * @param args 参数
      */
     public static void main(String[] args) {
-        Constants.pringInfo();
+        Const.pringInfo();
 
         try {
             //先接收参数

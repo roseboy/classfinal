@@ -5,7 +5,7 @@ package net.roseboy.classfinal;
  *
  * @author roseboy
  */
-public class Constants {
+public class Const {
 
     //打包时需要删除的文件
     public static final String[] DLE_FILES = {".DS_Store", "Thumbs.db"};
