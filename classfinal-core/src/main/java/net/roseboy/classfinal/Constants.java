@@ -11,12 +11,16 @@ public class Constants {
     public static final String[] DLE_FILES = {".DS_Store", "Thumbs.db"};
 
     //加密出来的文件名
-    public static final String FILE_NAME = "classes.dat";
+    public static final String FILE_NAME = "classes";
 
     //lib下的jar解压的目录名后缀
     public static final String LIB_JAR_DIR = "_temp";
 
+    //文件路径分隔符
     public static final String FILE_SEPARATOR = "/";
+
+    //调试模式
+    public static boolean DEBUG = false;
 
     public static void pringInfo() {
         System.out.println();

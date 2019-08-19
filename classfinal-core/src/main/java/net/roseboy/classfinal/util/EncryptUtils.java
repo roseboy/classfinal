@@ -1,6 +1,7 @@
 package net.roseboy.classfinal.util;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
@@ -21,6 +22,92 @@ public class EncryptUtils {
     private static final String SALT = "whoisyourdaddy#$@#@";
     //rsa 长度
     private static int KEY_LENGTH = 1024;
+
+    /**
+     * 加密
+     *
+     * @param msg  内容
+     * @param key  密钥
+     * @param type 类型
+     * @return 密文
+     */
+    public static byte[] en(byte[] msg, String key, int type) {
+        if (type == 1) {
+            return enAES(msg, md5(key + SALT));
+        }
+        return enSimple(msg, key);
+    }
+
+    /**
+     * 解密
+     *
+     * @param msg  密文
+     * @param key  密钥
+     * @param type 类型
+     * @return 明文
+     */
+    public static byte[] de(byte[] msg, String key, int type) {
+        if (type == 1) {
+            return deAES(msg, md5(key + SALT));
+        }
+        return deSimple(msg, key);
+    }
+
+    /**
+     * 合并byte[]
+     *
+     * @param bts 字节数组
+     * @return 合并后的字节
+     */
+    private static byte[] merger(byte[]... bts) {
+        int lenght = 0;
+        for (byte[] b : bts) {
+            lenght += b.length;
+        }
+
+        byte[] bt = new byte[lenght];
+        int lastLength = 0;
+        for (byte[] b : bts) {
+            System.arraycopy(b, 0, bt, lastLength, b.length);
+            lastLength = b.length;
+        }
+        return bt;
+    }
+
+    /**
+     * md5加密
+     *
+     * @param str 字符串
+     * @return md5字串
+     */
+    public static byte[] md5byte(String str) {
+        byte[] b = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(str.getBytes());
+            b = md.digest();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return b;
+    }
+
+    /**
+     * md5
+     *
+     * @param str 字串
+     * @return 32位md5
+     */
+    public static String md5(String str) {
+        String result = "";
+        byte s[] = md5byte(str);
+
+        for (int i = 0; i < s.length; i++) {
+            result += Integer.toHexString((0x000000FF & s[i]) | 0xFFFFFF00).substring(6);
+        }
+        return result;
+    }
+
 
     /**
      * 加密
@@ -76,47 +163,6 @@ public class EncryptUtils {
      */
     public static byte[] deSimple(byte[] msg, String key) {
         return deSimple(msg, 0, msg.length - 1, key);
-    }
-
-
-    /**
-     * md5加密
-     *
-     * @param str 字符串
-     * @return md5字串
-     */
-    public static byte[] md5byte(String str) {
-        byte[] b = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update(str.getBytes());
-            b = md.digest();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return b;
-    }
-
-
-    /**
-     * 合并byte[]
-     *
-     * @param bts 字节数组
-     * @return 合并后的字节
-     */
-    private static byte[] merger(byte[]... bts) {
-        int lenght = 0;
-        for (byte[] b : bts) {
-            lenght += b.length;
-        }
-
-        byte[] bt = new byte[lenght];
-        int lastLength = 0;
-        for (byte[] b : bts) {
-            System.arraycopy(b, 0, bt, lastLength, b.length);
-            lastLength = b.length;
-        }
-        return bt;
     }
 
     /**
@@ -237,16 +283,6 @@ public class EncryptUtils {
                 out = merger(out, cipher.doFinal(in));
             }
         }
-
-//        for (int i = 0; i < msg.length; i++) {
-//            if (msg.length - i < in_length && i % in_length == 0) {
-//                in = new byte[msg.length - i];
-//            }
-//            in[i % in.length] = msg[i];
-//            if (i == (msg.length - 1) || (i % in_length + 1 == in_length)) {
-//                out = merger(out, cipher.doFinal(in));
-//            }
-//        }
         return out;
     }
 
@@ -276,6 +312,85 @@ public class EncryptUtils {
         return keyMap;
     }
 
+
+    /**
+     * AES加密字符串
+     *
+     * @param str 要加密的字符串
+     * @param key 密钥
+     * @return 加密结果
+     */
+    public static String enAES(String str, String key) {
+        byte[] encrypted = null;
+        try {
+            encrypted = enAES(str.getBytes("utf-8"), key);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return encrypted == null ? null : Base64.getEncoder().encodeToString(encrypted);
+    }
+
+    /**
+     * AES加密字节
+     *
+     * @param msg 字节数组
+     * @param key 密钥
+     * @return 加密后的字节
+     */
+    public static byte[] enAES(byte[] msg, String key) {
+        byte[] encrypted = null;
+        try {
+            byte[] raw = key.getBytes("utf-8");
+            SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");//"算法/模式/补码方式"
+            cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
+            encrypted = cipher.doFinal(msg);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return encrypted;
+    }
+
+    /**
+     * AES解密
+     *
+     * @param str 密文字串
+     * @param key 密钥
+     * @return 明文字串
+     */
+    public static String deAES(String str, String key) {
+        String originalString = null;
+        byte[] msg = Base64.getDecoder().decode(str);
+        byte[] original = deAES(msg, key);
+        try {
+            originalString = new String(original, "utf-8");
+        } catch (Exception e) {
+
+        }
+        return originalString;
+    }
+
+    /**
+     * AES解密
+     *
+     * @param msg 要解密的字节
+     * @param key 密钥
+     * @return 明文字节
+     */
+    public static byte[] deAES(byte[] msg, String key) {
+        byte[] original = null;
+        try {
+            byte[] raw = key.getBytes("utf-8");
+            SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, skeySpec);
+            original = cipher.doFinal(msg);
+        } catch (Exception ex) {
+
+        }
+        return original;
+    }
+
     /**
      * 加密测试
      *
@@ -283,19 +398,27 @@ public class EncryptUtils {
      * @throws Exception Exception
      */
     public static void main(String[] args) throws Exception {
-        //生成公钥和私钥
-        Map<Integer, String> keyMap = genKeyPair();
         //加密字符串
         String message = "测试abcd1234！@#¥";
         for (int i = 0; i <= 10; i++) {
             message += message;
         }
-        System.out.println("公钥:" + keyMap.get(0));
-        System.out.println("私钥:" + keyMap.get(1));
-        String messageEn = enRSA(message, keyMap.get(0));
-        System.out.println("密文:" + messageEn);
-        String messageDe = deRSA(messageEn, keyMap.get(1));
+
+//        //生成公钥和私钥
+//        Map<Integer, String> keyMap = genKeyPair();
+//        System.out.println("公钥:" + keyMap.get(0));
+//        System.out.println("私钥:" + keyMap.get(1));
+//        String messageEn = enRSA(message, keyMap.get(0));
+//        System.out.println("密文:" + messageEn);
+//        String messageDe = deRSA(messageEn, keyMap.get(1));
+//        System.out.println("明文:" + message);
+//        System.out.println("明文:" + messageDe);
+
+
         System.out.println("明文:" + message);
-        System.out.println("明文:" + messageDe);
+        String m = enAES(message, md5("admin"));
+        System.out.println("密文:" + m);
+        System.out.println("明文:" + deAES(m, md5("admin")));
+        System.out.println("md5:" + md5("admin"));
     }
 }

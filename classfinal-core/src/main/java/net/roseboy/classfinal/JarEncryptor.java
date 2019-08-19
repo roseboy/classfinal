@@ -2,10 +2,7 @@ package net.roseboy.classfinal;
 
 import javassist.ClassPool;
 import javassist.NotFoundException;
-import net.roseboy.classfinal.util.ClassUtils;
-import net.roseboy.classfinal.util.EncryptUtils;
-import net.roseboy.classfinal.util.IoUtils;
-import net.roseboy.classfinal.util.JarUtils;
+import net.roseboy.classfinal.util.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -83,13 +80,28 @@ public class JarEncryptor {
 
         //[1]释放所有文件，内部jar只释放需要加密的jar
         List<String> allFile = JarUtils.unJar(jarPath, targetDir, includeJars);
+        if (Constants.DEBUG) {
+            for (String file : allFile) {
+                Log.debug("释放文件：" + file);
+            }
+        }
 
         //[2]按照jar包名分组,只要需要加密的class文件
         Map<String, List<String>> jarClasses = groupByJarName(allFile);
+        if (Constants.DEBUG) {
+            for (Map.Entry<String, List<String>> entry : jarClasses.entrySet()) {
+                Log.debug("文件分组：" + entry.getKey() + "  [" + entry.getValue().size() + "]");
+            }
+        }
 
         //[3]将正常的class加密，压缩另存
-        List<String> encryptClass = encryptClass(jarClasses);
+        List<String> encryptClass = encryptClass2(jarClasses);
         encryptFileCount = encryptClass.size();
+        if (Constants.DEBUG) {
+            for (String s : encryptClass) {
+                Log.debug("加密文件：" + s);
+            }
+        }
 
         //[4]修改class方法体，并保存文件
         clearClassMethod(jarClasses);
@@ -188,7 +200,7 @@ public class JarEncryptor {
                     File sourceFile = new File(classPath);
                     zos.putNextEntry(new ZipEntry(classname));
                     byte[] bytes = IoUtils.readFileToByte(sourceFile);
-                    bytes = EncryptUtils.enSimple(bytes, password + classname);
+                    bytes = EncryptUtils.en(bytes, password + classname, 1);
                     zos.write(bytes, 0, bytes.length);
                     zos.closeEntry();
                     encryptClasses.add(classname);
@@ -199,6 +211,36 @@ public class JarEncryptor {
         } finally {
             IoUtils.close(zos, out);
         }
+        return encryptClasses;
+    }
+
+    /**
+     * 加密class文件不压缩，放在META-INF/classes里
+     *
+     * @param jarClasses 分组好的jar和jar下的class
+     * @return 已经加密的类名
+     */
+    private List<String> encryptClass2(Map<String, List<String>> jarClasses) {
+        //已经加密的类名
+        List<String> encryptClasses = new ArrayList<>();
+
+        File metaInfoClasses = new File(targetDir + Constants.FILE_SEPARATOR + "META-INF" + Constants.FILE_SEPARATOR + Constants.FILE_NAME);
+        if (!metaInfoClasses.exists()) {
+            metaInfoClasses.mkdirs();
+        }
+
+        for (Map.Entry<String, List<String>> entry : jarClasses.entrySet()) {
+            for (String classname : entry.getValue()) {
+                String classPath = targetDir + Constants.FILE_SEPARATOR + realPath(entry.getKey(), classname, jarOrWar);
+                File sourceFile = new File(classPath);
+                byte[] bytes = IoUtils.readFileToByte(sourceFile);
+                bytes = EncryptUtils.en(bytes, password + classname, 1);
+                File targetFile = new File(metaInfoClasses, classname);
+                IoUtils.writeFile(targetFile, bytes);
+                encryptClasses.add(classname);
+            }
+        }
+
         return encryptClasses;
     }
 

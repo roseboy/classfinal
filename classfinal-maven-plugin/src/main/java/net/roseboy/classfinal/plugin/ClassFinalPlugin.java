@@ -12,6 +12,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+
 import java.util.List;
 
 /**
@@ -26,17 +27,20 @@ public class ClassFinalPlugin extends AbstractMojo {
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
     //密码
-    @Parameter(property = "password", required = true)
+    @Parameter(required = true)
     private String password;
     //加密的内部-lib/jar名称
-    @Parameter(property = "libjars")
+    @Parameter
     String libjars;
     //要加密的包名前缀
-    @Parameter(property = "packages")
+    @Parameter
     String packages;
     //排除的类名
-    @Parameter(property = "excludes")
+    @Parameter
     String excludes;
+    //调试
+    @Parameter(defaultValue = "false")
+    Boolean debug;
 
     /**
      * 打包的时候执行
@@ -45,6 +49,7 @@ public class ClassFinalPlugin extends AbstractMojo {
      * @throws MojoFailureException   MojoFailureException
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
+        Constants.DEBUG = debug;
         Log logger = getLog();
         Build build = project.getBuild();
 
