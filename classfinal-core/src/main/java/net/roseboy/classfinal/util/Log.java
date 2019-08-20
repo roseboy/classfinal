@@ -11,7 +11,7 @@ public class Log {
      *
      * @param msg 信息
      */
-    public static void debug(String msg) {
+    public static void debug(Object msg) {
         System.out.println("[DEBUG] " + msg);
     }
 }

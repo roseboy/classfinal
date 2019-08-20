@@ -2,6 +2,7 @@ package net.roseboy.classfinal;
 
 import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
+import java.security.Permission;
 import java.security.ProtectionDomain;
 
 
@@ -30,21 +31,26 @@ public class AgentTransformer implements ClassFileTransformer {
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
                             ProtectionDomain protectionDomain, byte[] classfileBuffer) {
-        if (className == null) {
+        if (className == null || protectionDomain == null || loader == null) {
             return classfileBuffer;
         }
-        String encryptFile = loader.getResource("/../../").getPath();
 
-        //jar文件
-        if (encryptFile.startsWith("file:")) {
-            encryptFile = encryptFile.substring(5);
-            if (encryptFile.contains(".jar!")) {
-                encryptFile = encryptFile.substring(0, encryptFile.indexOf(".jar!") + 4);
-            }
+        Permission permission = protectionDomain.getPermissions().elements().nextElement();
+        String encryptFile = permission.getName();
+        //war包解压后的WEB-INF/classes目录
+        if (encryptFile.endsWith("-") && encryptFile.contains("WEB-INF") && encryptFile.contains("classes")) {
+            encryptFile = encryptFile.substring(0, encryptFile.indexOf("WEB-INF"));
+        }
+        //war包解压后WEB-INF/lib
+        else if (encryptFile.endsWith(".jar") && encryptFile.contains("WEB-INF") && encryptFile.contains("lib")) {
+            encryptFile = encryptFile.substring(0, encryptFile.indexOf("WEB-INF"));
+        }
+        //tomcat home 下的bin或lib
+        else if (encryptFile.contains("lib") || encryptFile.contains("bin")) {
+            return classfileBuffer;
         }
 
-        className = className.replace(Const.FILE_SEPARATOR, ".");
-        className = className.replace(File.separator, ".");
+        className = className.replace("/", ".").replace("\\", ".");
 
         byte[] bytes = decryptor.doDecrypt(encryptFile, className, pwd);
         //CAFEBABE,表示解密成功

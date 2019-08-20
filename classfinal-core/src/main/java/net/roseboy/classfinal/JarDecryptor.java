@@ -29,9 +29,10 @@ public class JarDecryptor {
         File workDir = new File(encryptFile);
         byte[] bytes = null;
 
+        //jar文件
         if (workDir.isFile()) {
             bytes = JarUtils.getFileFromJar(workDir, classFile);
-        } else {
+        } else {//war解压的目录
             File file = new File(workDir, classFile);
             if (file.exists()) {
                 bytes = IoUtils.readFileToByte(file);

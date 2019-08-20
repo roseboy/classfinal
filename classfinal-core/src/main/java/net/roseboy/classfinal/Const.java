@@ -16,7 +16,7 @@ public class Const {
     //lib下的jar解压的目录名后缀
     public static final String LIB_JAR_DIR = "_temp";
 
-    //文件路径分隔符
+    //文件路径分隔符；win、linux建议都用这个
     public static final String FILE_SEPARATOR = "/";
 
     //调试模式
