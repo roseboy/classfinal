@@ -11,7 +11,7 @@
 
     <groupId>net.roseboy</groupId>
     <artifactId>classfinal</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <modules>
         <module>classfinal-core</module><!--主要代码在这里-->
         <module>classfinal-fatjar</module><!--单独运行的jar、javaagent-->
