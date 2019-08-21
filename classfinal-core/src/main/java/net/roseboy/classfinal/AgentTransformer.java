@@ -1,6 +1,5 @@
 package net.roseboy.classfinal;
 
-import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
 import java.security.Permission;
 import java.security.ProtectionDomain;

@@ -1,11 +1,8 @@
 package net.roseboy.classfinal;
 
 
+import net.roseboy.classfinal.util.CmdLineOption;
 import net.roseboy.classfinal.util.StrUtils;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
 
 import java.util.List;
 import java.util.Scanner;
@@ -26,10 +23,11 @@ public class Main {
      */
     public static void main(String[] args) {
         Const.pringInfo();
+        Scanner scanner = new Scanner(System.in);
 
         try {
             //先接收参数
-            CommandLine cmd = getCmdOptions(args);
+            CmdLineOption cmd = getCmdOptions(args);
             if (cmd == null) {
                 return;
             }
@@ -46,7 +44,6 @@ public class Main {
             String password = cmd.getOptionValue("pwd");
 
             //没有参数手动输入
-            Scanner scanner = new Scanner(System.in);
             if (args == null || args.length == 0) {
                 while (StrUtils.isEmpty(path)) {
                     System.out.print("请输入需要加密的jar/war路径:");
@@ -67,7 +64,6 @@ public class Main {
                     password = scanner.nextLine();
                 }
             }
-            scanner.close();
 
             //test数据
             if ("123123".equals(path)) {
@@ -115,6 +111,8 @@ public class Main {
                 //加密过程
                 System.out.println("处理中...");
                 JarEncryptor decryptor = new JarEncryptor(path, password, packageList, includeJarList, excludeClassList);
+
+                System.out.println(decryptor.getClass().getProtectionDomain());
                 String result = decryptor.doEncryptJar();
                 System.out.println("加密完成，请牢记密码！");
                 System.out.println(result);
@@ -122,8 +120,10 @@ public class Main {
                 System.out.println("已取消！");
             }
         } catch (Exception e) {
-            //e.printStackTrace();
+            e.printStackTrace();
             System.out.println("ERROR: " + e.getMessage());
+        } finally {
+            scanner.close();
         }
     }
 
@@ -132,9 +132,8 @@ public class Main {
      *
      * @return CommandLine
      */
-    public static CommandLine getCmdOptions(String[] args) {
-        CommandLine cmd = null;
-        Options options = new Options();
+    public static CmdLineOption getCmdOptions(String[] args) {
+        CmdLineOption options = new CmdLineOption();
         options.addOption("packages", true, "加密的包名(可为空,多个用\",\"分割)");
         options.addOption("pwd", true, "加密密码");
         options.addOption("exclude", true, "排除的类名(可为空,多个用\",\"分割)");
@@ -143,12 +142,11 @@ public class Main {
         options.addOption("Y", false, "无需确认");
 
         try {
-            CommandLineParser parser = new DefaultParser();
-            cmd = parser.parse(options, args);
+            options.parse(args);
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
         }
-        return cmd;
+        return options;
     }
 
 }
