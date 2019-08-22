@@ -25,7 +25,7 @@ public class JarDecryptor {
     public byte[] doDecrypt(String encryptFile, String className, String password) {
         long t1 = System.currentTimeMillis();
 
-        String classFile = "META-INF" + Const.FILE_SEPARATOR + Const.FILE_NAME + Const.FILE_SEPARATOR + className;
+        String classFile = "META-INF/" + Const.FILE_NAME + "/" + className;
         File workDir = new File(encryptFile);
         byte[] bytes = null;
 

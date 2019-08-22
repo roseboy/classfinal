@@ -27,10 +27,15 @@ public class Main {
 
         try {
             //先接收参数
-            CmdLineOption cmd = getCmdOptions(args);
-            if (cmd == null) {
-                return;
-            }
+            CmdLineOption cmd = new CmdLineOption();
+            cmd.addOption("packages", true, "加密的包名(可为空,多个用\",\"分割)");
+            cmd.addOption("pwd", true, "加密密码");
+            cmd.addOption("exclude", true, "排除的类名(可为空,多个用\",\"分割)");
+            cmd.addOption("file", true, "加密的jar/war路径");
+            cmd.addOption("libjars", true, "jar/war lib下的jar(多个用\",\"分割)");
+            cmd.addOption("Y", false, "无需确认");
+            cmd.parse(args);
+
 
             //需要加密的class路径
             String path = cmd.getOptionValue("file");
@@ -76,6 +81,7 @@ public class Main {
                 packages = "com.yiyon,net.roseboy,yiyon";//包名过滤
                 excludeClass = "org.spring";//排除的类
                 password = "123456";
+                //Const.DEBUG = true;
             }
 
 
@@ -110,11 +116,13 @@ public class Main {
 
                 //加密过程
                 System.out.println("处理中...");
-                JarEncryptor decryptor = new JarEncryptor(path, password, packageList, includeJarList, excludeClassList);
+                long t1 = System.currentTimeMillis();
+                //JarEncryptor decryptor = new JarEncryptor(path, password, packageList, includeJarList, excludeClassList);
 
-                System.out.println(decryptor.getClass().getProtectionDomain());
+                JarEncryptor2 decryptor = new JarEncryptor2(path, password, packageList, includeJarList, excludeClassList);
                 String result = decryptor.doEncryptJar();
-                System.out.println("加密完成，请牢记密码！");
+                long t2 = System.currentTimeMillis();
+                System.out.println("加密完成，请牢记密码！" + (t2 - t1));
                 System.out.println(result);
             } else {
                 System.out.println("已取消！");
@@ -126,27 +134,4 @@ public class Main {
             scanner.close();
         }
     }
-
-    /**
-     * cmd 参数
-     *
-     * @return CommandLine
-     */
-    public static CmdLineOption getCmdOptions(String[] args) {
-        CmdLineOption options = new CmdLineOption();
-        options.addOption("packages", true, "加密的包名(可为空,多个用\",\"分割)");
-        options.addOption("pwd", true, "加密密码");
-        options.addOption("exclude", true, "排除的类名(可为空,多个用\",\"分割)");
-        options.addOption("file", true, "加密的jar/war路径");
-        options.addOption("libjars", true, "jar/war lib下的jar(多个用\",\"分割)");
-        options.addOption("Y", false, "无需确认");
-
-        try {
-            options.parse(args);
-        } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
-        return options;
-    }
-
 }
