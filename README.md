@@ -117,5 +117,5 @@ set CATALINA_OPTS="%CATALINA_OPTS% -javaagent:classfinal-fatjar.jar='-pwd 000000
 > 密码一旦忘记，项目不可启动且无法恢复，请牢记密码。
 
 > 本工具加密后，原始的class文件并不会完全被加密，只是方法体被清空，保留方法参数、注解等信息，这是为了兼容spring，swagger等扫描注解的框架；
-方法体被清空后，反编译者只能看到方法名和注解，看不到方法的具体内容；改class被classloader加载时，真正的方法体会被解密注入。
+方法体被清空后，反编译者只能看到方法名和注解，看不到方法的具体内容；当class被classloader加载时，真正的方法体会被解密注入。
 
