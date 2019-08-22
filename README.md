@@ -32,10 +32,10 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
 参数说明
 -file        加密的jar/war完整路径
 -packages    加密的包名(可为空,多个用","分割)
--libjars     jar/war包lib下要加密jar文件名(多个用","分割)
+-libjars     jar/war包lib下要加密jar文件名(可为空,多个用","分割)
 -exclude     排除的类名(可为空,多个用","分割)
 -pwd         加密密码
--Y           无需确认，不加参数会提示确认以上信息
+-Y           无需确认，不加此参数会提示确认以上信息
 ```
 
 结果: 生成 yourpaoject-encrypted.jar，这个就是加密后的jar文件；加密后的文件不可直接执行，需要配置javaagent。
