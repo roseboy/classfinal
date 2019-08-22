@@ -12,7 +12,7 @@ ClassFinal是一款java class文件安全加密工具，支持直接加密jar包
 
 ## 功能特性
 * 无需修改原项目代码，只要把编译好的jar/war包用本工具加密即可。
-* 运行无需求修改tomcat，spring源代码。
+* 运行加密项目时，无需求修改tomcat，spring源代码。
 * 支持普通jar包、springboot jar包以及普通java web项目编译的war包。
 * 支持spring framework、swagger等需要在启动过程中扫描注解或生成字节码的框架。
 * 支持maven插件，添加插件后在打包过程中自动加密。
