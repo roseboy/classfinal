@@ -22,6 +22,10 @@ ClassFinal是一款java class文件安全加密工具，支持直接加密jar包
 JDK 1.8 +
 
 ## 使用说明
+
+### 下载
+[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.0.5/classfinal-fatjar-1.0.5.jar)
+
 ### 加密
 
 执行以下命令
