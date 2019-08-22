@@ -111,6 +111,9 @@ set CATALINA_OPTS="%CATALINA_OPTS% -javaagent:classfinal-fatjar.jar='-pwd 000000
 -pwd 0000000             密码
 ```
 
+-------------------------
+
 > 本工具使用AES算法加密class文件，密码是保证不被破解的关键，请保存好密码，请勿泄漏。
+
 > 密码一旦忘记，项目不可启动且无法恢复，请牢记密码。
 
