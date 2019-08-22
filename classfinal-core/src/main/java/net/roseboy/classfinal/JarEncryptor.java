@@ -5,10 +5,7 @@ import javassist.NotFoundException;
 import net.roseboy.classfinal.util.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * java class加密
@@ -31,6 +28,8 @@ public class JarEncryptor {
     private String jarOrWar = null;
     //工作目录
     private File targetDir = null;
+    //-INF/lib目录
+    private File targetLibDir = null;
     //加密的文件数量
     private Integer encryptFileCount = null;
     //存储解析出来的类名和路径
@@ -52,7 +51,8 @@ public class JarEncryptor {
      * @param excludeClass 排除的类名
      * @param password     密码
      */
-    public JarEncryptor(String jarPath, String password, List<String> packages, List<String> includeJars, List<String> excludeClass) {
+    public JarEncryptor(String jarPath, String password, List<String> packages,
+                        List<String> includeJars, List<String> excludeClass) {
         super();
         this.jarPath = jarPath;
         this.packages = packages;
@@ -76,6 +76,7 @@ public class JarEncryptor {
         this.jarOrWar = jarPath.substring(jarPath.lastIndexOf(".") + 1);
         //临时work目录
         this.targetDir = new File(jarPath.replace("." + jarOrWar, Const.LIB_JAR_DIR));
+        this.targetLibDir = new File(this.targetDir, ("jar".equals(jarOrWar) ? "BOOT-INF" : "WEB-INF") + File.separator + "lib");
 
         //[1]释放所有文件，内部jar只释放需要加密的jar
         List<String> allFile = JarUtils.unJar(jarPath, this.targetDir.getAbsolutePath(), includeJars);
@@ -84,7 +85,9 @@ public class JarEncryptor {
         List<File> classFiles = filterClasses(allFile);
 
         //[3]将本项目的代码添加至jar中
-        addClassFinalAgent();
+        if ("jar".equalsIgnoreCase(this.jarOrWar)) {
+            addClassFinalAgent();
+        }
 
         //[4]将正常的class加密，压缩另存
         List<String> encryptClass = encryptClass(classFiles);
@@ -115,7 +118,8 @@ public class JarEncryptor {
      * @param password     密码
      * @return 加密后文件的路径
      */
-    public String doEncryptJar(String jarPath, String password, List<String> packages, List<String> includeJars, List<String> excludeClass) {
+    public String doEncryptJar(String jarPath, String password, List<String> packages,
+                               List<String> includeJars, List<String> excludeClass) {
         this.jarPath = jarPath;
         this.packages = packages;
         this.includeJars = includeJars;
@@ -157,17 +161,17 @@ public class JarEncryptor {
         List<String> encryptClasses = new ArrayList<>();
 
         //加密后存储的位置
-        File metaInfoClasses = new File(this.targetDir, "META-INF" + File.separator + Const.FILE_NAME);
-        if (!metaInfoClasses.exists()) {
-            metaInfoClasses.mkdirs();
+        File metaDir = new File(this.targetDir, "META-INF" + File.separator + Const.FILE_NAME);
+        if (!metaDir.exists()) {
+            metaDir.mkdirs();
         }
 
+        //加密另存
         for (File classFile : classFiles) {
-            //解析出类全名
             String className = resolveClassName(classFile.getAbsolutePath(), true);
             byte[] bytes = IoUtils.readFileToByte(classFile);
             bytes = EncryptUtils.en(bytes, password + className, 1);
-            File targetFile = new File(metaInfoClasses, className);
+            File targetFile = new File(metaDir, className);
             IoUtils.writeFile(targetFile, bytes);
             encryptClasses.add(className);
         }
@@ -179,15 +183,13 @@ public class JarEncryptor {
      * 清空class文件的方法体，并保留参数信息
      *
      * @param classFiles jar/war 下需要加密的class文件
-     * @throws NotFoundException NotFoundException
      */
     private void clearClassMethod(List<File> classFiles) {
-        File libDir = new File(this.targetDir, ("jar".equals(jarOrWar) ? "BOOT-INF" : "WEB-INF") + File.separator + "lib");
         try {
             //初始化javassist
             ClassPool pool = ClassPool.getDefault();
             //lib目录
-            ClassUtils.loadClassPath(pool, new File[]{libDir});
+            ClassUtils.loadClassPath(pool, new File[]{this.targetLibDir});
             List<String> classPaths = new ArrayList<>();
             for (File classFile : classFiles) {
                 //要修改的class所在的目录
@@ -217,17 +219,19 @@ public class JarEncryptor {
      * @return 打包后的jar绝对路径
      */
     private String packageJar() {
-        File libDir = new File(this.targetDir, ("jar".equals(jarOrWar) ? "BOOT-INF" : "WEB-INF") + File.separator + "lib");
-
         //[1]先打包lib下的jar
         for (String jar : includeJars) {
             if (!jar.endsWith(".jar")) {
                 continue;
             }
-            String jarDir = libDir.getAbsolutePath() + File.separator + jar.substring(0, jar.length() - 4) + Const.LIB_JAR_DIR;
-            JarUtils.doJar(jarDir, libDir.getAbsolutePath() + File.separator + jar);
+            String jarFile = this.targetLibDir.getAbsolutePath() + File.separator + jar;
+            String jarDir = jarFile.substring(0, jarFile.length() - 4) + Const.LIB_JAR_DIR;
+            JarUtils.doJar(jarDir, jarFile);
             IoUtils.delete(new File(jarDir));
         }
+
+        //删除meta-inf下的maven
+        IoUtils.delete(new File(this.targetDir, "META-INF/maven"));
 
         //[2]再打包jar
         String enctyptedJar = jarPath.replace("." + jarOrWar, "-encrypted." + jarOrWar);
@@ -242,11 +246,10 @@ public class JarEncryptor {
      */
     public void addClassFinalAgent() {
         List<String> paths = new ArrayList<>();
-        String p1 = this.getClass().getProtectionDomain().getPermissions().elements().nextElement().getName();
-        String p2 = ClassPool.class.getProtectionDomain().getPermissions().elements().nextElement().getName();
+        String p1 = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+        String p2 = ClassPool.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         paths.add(p1);
         paths.add(p2);
-
         for (String path : paths) {
             if (path.endsWith("-")) {
                 List<File> files = new ArrayList<>();
@@ -264,12 +267,23 @@ public class JarEncryptor {
             } else if (path.endsWith(".jar")) {
                 List<String> excludeFiles = new ArrayList<>();
                 excludeFiles.add("META-INF/MANIFEST.MF");
-                excludeFiles.add("META-INF/maven/org.javassist/javassist/");
-                excludeFiles.add("META-INF/maven/org.javassist/javassist/pom.xml");
-                excludeFiles.add("META-INF/maven/org.javassist/javassist/pom.properties");
+                excludeFiles.add("说明.txt");
                 JarUtils.unJar(path, this.targetDir.getAbsolutePath(), null, excludeFiles);
             }
         }
+
+        //把javaagent信息加入到MANIFEST.MF
+        File manifest = new File(this.targetDir, "META-INF/MANIFEST.MF");
+        String[] txts = IoUtils.readTxtFile(manifest).split("\r\n");
+        StringBuffer newTxt = new StringBuffer();
+        for (int i = 0; i < txts.length; i++) {
+            newTxt.append(txts[i]).append("\r\n");
+            if (txts[i].startsWith("Main-Class:")) {
+                newTxt.append("Premain-Class: ").append(CoreAgent.class.getName()).append("\r\n");
+            }
+        }
+        newTxt.append("\r\n\r\n");
+        IoUtils.writeTxtFile(manifest, newTxt.toString());
     }
 
     /**

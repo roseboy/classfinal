@@ -129,7 +129,7 @@ public class IoUtils {
     /**
      * 复制输入输出流
      *
-     * @param input 输入流
+     * @param input  输入流
      * @param output 输出流
      * @return 字节大小
      * @throws IOException IOException
@@ -175,6 +175,53 @@ public class IoUtils {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * 读取文本文件
+     *
+     * @param file 文件
+     * @return 内容
+     */
+    public static String readTxtFile(File file) {
+        StringBuffer txt = new StringBuffer("");
+        InputStreamReader read = null;
+        try {
+            read = new InputStreamReader(new FileInputStream(file), "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(read);
+            String lineTxt;
+            while ((lineTxt = bufferedReader.readLine()) != null) {
+                txt.append(lineTxt).append("\r\n");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            IoUtils.close(read);
+        }
+        return txt.toString();
+    }
+
+    /**
+     * 写文件
+     *
+     * @param file 文件
+     * @param txt  内容
+     */
+    public static void writeTxtFile(File file, String txt) {
+        BufferedWriter out = null;
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            out = new BufferedWriter(new FileWriter(file));
+            out.write(txt);
+            out.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            IoUtils.close(out);
         }
     }
 }

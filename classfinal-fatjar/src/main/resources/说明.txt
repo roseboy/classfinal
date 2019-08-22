@@ -14,7 +14,7 @@
 -----------------------------
 示例: 加密普通jar、springboot的jar或springweb的war
 
-执行: java -jar this.jar -file springboot.jar -libjars a.jar,b.jar -packages com.yourpackage,com.yourpackage2 -exclude com.yourpackage.Main -pwd 123456 -Y
+执行: java -jar classfinal-fatjar.jar -file springboot.jar -libjars a.jar,b.jar -packages com.yourpackage,com.yourpackage2 -exclude com.yourpackage.Main -pwd 123456 -Y
 结果: 生成 springboot-encrypted.jar，这个就是加密后的jar文件；加密后的文件不可直接执行，需要配置javaagent。
 
 参数说明:
@@ -27,7 +27,7 @@
 
 
 注:
-以上示例是直接用参数执行，也可以直接执行 java -jar this.jar按照步骤提示输入信息完成加密。
+以上示例是直接用参数执行，也可以直接执行 java -jar classfinal-fatjar.jar按照步骤提示输入信息完成加密。
 
 
 ====================
@@ -43,7 +43,7 @@
 -----------------------------
 示例1: 启动普通jar、springboot的jar
 
-执行: java -javaagent:this.jar='-pwd 0000000' -jar /project/springboot-encrypted.jar
+执行: java -javaagent:/project/springboot-encrypted.jar='-pwd 0000000' -jar /project/springboot-encrypted.jar
 
 参数说明:
 -pwd 0000000                            密码
@@ -51,7 +51,7 @@
 -----------------------------
 示例2: tomcat运行解压过的war包
 tomcat catalina.sh 增加以下配置:
-CATALINA_OPTS="$CATALINA_OPTS -javaagent:this.jar='-pwd 0000000'";
+CATALINA_OPTS="$CATALINA_OPTS -javaagent:classfinal-fatjar.jar='-pwd 0000000'";
 export CATALINA_OPTS;
 
 
