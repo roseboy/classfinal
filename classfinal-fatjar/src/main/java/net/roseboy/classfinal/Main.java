@@ -116,13 +116,9 @@ public class Main {
 
                 //加密过程
                 System.out.println("处理中...");
-                long t1 = System.currentTimeMillis();
-                //JarEncryptor decryptor = new JarEncryptor(path, password, packageList, includeJarList, excludeClassList);
-
-                JarEncryptor2 decryptor = new JarEncryptor2(path, password, packageList, includeJarList, excludeClassList);
+                JarEncryptor decryptor = new JarEncryptor(path, password, packageList, includeJarList, excludeClassList);
                 String result = decryptor.doEncryptJar();
-                long t2 = System.currentTimeMillis();
-                System.out.println("加密完成，请牢记密码！" + (t2 - t1));
+                System.out.println("加密完成，请牢记密码！");
                 System.out.println(result);
             } else {
                 System.out.println("已取消！");

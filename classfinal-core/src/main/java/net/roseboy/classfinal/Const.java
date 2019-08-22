@@ -14,7 +14,7 @@ public class Const {
     public static final String FILE_NAME = "classes";
 
     //lib下的jar解压的目录名后缀
-    public static final String LIB_JAR_DIR = "_temp";
+    public static final String LIB_JAR_DIR = "__temp__";
 
     //调试模式
     public static boolean DEBUG = false;

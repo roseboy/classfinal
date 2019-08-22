@@ -13,6 +13,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -55,15 +56,15 @@ public class ClassFinalPlugin extends AbstractMojo {
 
         long t1 = System.currentTimeMillis();
 
-        String targetjar = build.getDirectory() + Const.FILE_SEPARATOR + build.getFinalName() + "." + project.getPackaging();
-        logger.info("Encrypting " + project.getPackaging() + " [" + targetjar + "]");
+        String targetJar = build.getDirectory() + File.separator + build.getFinalName() + "." + project.getPackaging();
+        logger.info("Encrypting " + project.getPackaging() + " [" + targetJar + "]");
         List<String> includeJarList = StrUtils.toList(libjars);
         List<String> packageList = StrUtils.toList(packages);
         List<String> excludeClassList = StrUtils.toList(excludes);
         includeJarList.add("-");
 
         //加密过程
-        JarEncryptor encryptor = new JarEncryptor(targetjar, password, packageList, includeJarList, excludeClassList);
+        JarEncryptor encryptor = new JarEncryptor(targetJar, password, packageList, includeJarList, excludeClassList);
         String result = encryptor.doEncryptJar();
         long t2 = System.currentTimeMillis();
 
