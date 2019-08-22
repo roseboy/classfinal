@@ -12,7 +12,7 @@ ClassFinal是一款java class文件安全加密工具，支持直接加密jar包
 
 ## 功能特性
 * 无需修改原项目代码，只要把编译好的jar/war包用本工具加密即可。
-* 运行加密项目时，无需求修改tomcat，spring源代码。
+* 运行加密项目时，无需求修改tomcat，spring等源代码。
 * 支持普通jar包、springboot jar包以及普通java web项目编译的war包。
 * 支持spring framework、swagger等需要在启动过程中扫描注解或生成字节码的框架。
 * 支持maven插件，添加插件后在打包过程中自动加密。
@@ -54,11 +54,9 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
     <version>${classfinal.version}</version>
     <configuration>
         <password>000000</password>
-        <packages>com.yiyon,net.roseboy,yiyon</packages>
+        <packages>com.yourpackage,com.yourpackage2</packages>
         <excludes>org.spring</excludes>
-        <libjars>
-            yiyon-reimburse-1.0.0.jar,yiyon-labor-1.0.0.jar,yiyon-income-1.0.0.jar,yiyon-contract-1.0.0.jar,yiyon-budget-1.0.0.jar,yiyon-bonus-1.0.0.jar,yiyon-basedata-1.0.0.jar,jeee-core-1.0.0.jar,jeee-admin-1.0.0.jar,jeee-apimgr-1.0.0.jar,jeee-code-1.0.0.jar,jeee-filereview-1.0.0.jar,jeee-importer-1.0.0.jar,jeee-workflow-1.0.0.jar
-        </libjars>
+        <libjars>a.jar,b.jar</libjars>
     </configuration>
     <executions>
         <execution>
@@ -117,4 +115,7 @@ set CATALINA_OPTS="%CATALINA_OPTS% -javaagent:classfinal-fatjar.jar='-pwd 000000
 > 本工具使用AES算法加密class文件，密码是保证不被破解的关键，请保存好密码，请勿泄漏。
 
 > 密码一旦忘记，项目不可启动且无法恢复，请牢记密码。
+
+> 本工具加密后，原始的class文件并不会完全被加密，只是方法体被清空，保留方法参数、注解等信息，这是为了兼容spring，swagger等扫描注解的框架；
+方法体被清空后，反编译者只能看到方法名和注解，看不到方法的具体内容；改class被classloader加载时，真正的方法体会被解密注入。
 
