@@ -23,7 +23,7 @@ public class JarEncryptor {
     //排除的类名
     private List<String> excludeClass = null;
     //密码
-    private String password = null;
+    private char[] password = null;
     //jar还是war
     private String jarOrWar = null;
     //工作目录
@@ -51,7 +51,7 @@ public class JarEncryptor {
      * @param excludeClass 排除的类名
      * @param password     密码
      */
-    public JarEncryptor(String jarPath, String password, List<String> packages,
+    public JarEncryptor(String jarPath, char[] password, List<String> packages,
                         List<String> includeJars, List<String> excludeClass) {
         super();
         this.jarPath = jarPath;
@@ -70,7 +70,7 @@ public class JarEncryptor {
         if (!jarPath.endsWith(".jar") && !jarPath.endsWith(".war")) {
             throw new RuntimeException("jar/war文件格式有误");
         }
-        if (StrUtils.isEmpty(password)) {
+        if (password == null || password.length == 0) {
             throw new RuntimeException("密码不能为空");
         }
         this.jarOrWar = jarPath.substring(jarPath.lastIndexOf(".") + 1);
@@ -118,7 +118,7 @@ public class JarEncryptor {
      * @param password     密码
      * @return 加密后文件的路径
      */
-    public String doEncryptJar(String jarPath, String password, List<String> packages,
+    public String doEncryptJar(String jarPath, char[] password, List<String> packages,
                                List<String> includeJars, List<String> excludeClass) {
         this.jarPath = jarPath;
         this.packages = packages;
@@ -170,7 +170,7 @@ public class JarEncryptor {
         for (File classFile : classFiles) {
             String className = resolveClassName(classFile.getAbsolutePath(), true);
             byte[] bytes = IoUtils.readFileToByte(classFile);
-            bytes = EncryptUtils.en(bytes, password + className, 1);
+            bytes = EncryptUtils.en(bytes, IoUtils.merger(password, className.toCharArray()), 1);
             File targetFile = new File(metaDir, className);
             IoUtils.writeFile(targetFile, bytes);
             encryptClasses.add(className);

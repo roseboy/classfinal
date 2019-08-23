@@ -129,7 +129,7 @@ public class JarUtils {
 
                 //释放jar文件，如果在includeJars中，递归释放jar内的文件
                 if (entry.getName().endsWith(".jar")) {
-                    byte[] bytes = IoUtils.toByteArray(zipFile.getInputStream(entry));
+                    byte[] bytes = IoUtils.toBytes(zipFile.getInputStream(entry));
                     IoUtils.writeFile(targetFile, bytes);
                     String jarName = targetFile.getName();
                     if (includeJars == null || includeJars.size() == 0 || includeJars.contains(jarName)) {
@@ -147,7 +147,7 @@ public class JarUtils {
                 }
                 //其他文件，直接释放
                 else {
-                    byte[] bytes = IoUtils.toByteArray(zipFile.getInputStream(entry));
+                    byte[] bytes = IoUtils.toBytes(zipFile.getInputStream(entry));
                     IoUtils.writeFile(targetFile, bytes);
                 }
             }
@@ -196,7 +196,7 @@ public class JarUtils {
                 return null;
             }
             InputStream is = zipFile.getInputStream(zipEntry);
-            return IoUtils.toByteArray(is);
+            return IoUtils.toBytes(is);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

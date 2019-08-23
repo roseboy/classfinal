@@ -40,7 +40,7 @@ public class ClassUtils {
                     if (ca != null && ca.getCodeLength() != 1 && ca.getCode()[0] != -79) {
                         ClassUtils.setBodyKeepParamInfos(m, null, true);
                         if ("void".equalsIgnoreCase(m.getReturnType().getName()) && m.getLongName().endsWith(".main(java.lang.String[])") && m.getMethodInfo().getAccessFlags() == 9) {
-                            m.insertBefore("System.out.println(\"\\nstartup failed,invalid password.\\n\");");
+                            m.insertBefore("System.out.println(\"\\nStartup failed,invalid password.\\n\");");
                         }
 
                     }

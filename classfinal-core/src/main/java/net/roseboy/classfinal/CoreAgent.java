@@ -2,6 +2,7 @@ package net.roseboy.classfinal;
 
 import net.roseboy.classfinal.util.CmdLineOption;
 
+import java.io.Console;
 import java.lang.instrument.Instrumentation;
 
 /**
@@ -26,11 +27,20 @@ public class CoreAgent {
         options.addOption("pwd", true, "密码");
         options.addOption("debug", false, "调试模式");
 
-        String pwd = null;
+        char[] pwd = null;
         if (args != null) {
             options.parse(args.split(" "));
-            pwd = options.getOptionValue("pwd");
+            pwd = options.getOptionValue("pwd", "").toCharArray();
             Const.DEBUG = options.hasOption("debug");
+        }
+
+        if (pwd == null || pwd.length == 0) {
+            Console console = System.console();
+            if (console == null) {
+                System.out.println("\nStartup failed,invalid password.\n");
+                System.exit(0);
+            }
+            pwd = console.readPassword("Password:");
         }
 
         AgentTransformer tran = new AgentTransformer(pwd);

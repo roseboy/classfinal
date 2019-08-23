@@ -64,7 +64,7 @@ public class ClassFinalPlugin extends AbstractMojo {
         includeJarList.add("-");
 
         //加密过程
-        JarEncryptor encryptor = new JarEncryptor(targetJar, password, packageList, includeJarList, excludeClassList);
+        JarEncryptor encryptor = new JarEncryptor(targetJar, password.toCharArray(), packageList, includeJarList, excludeClassList);
         String result = encryptor.doEncryptJar();
         long t2 = System.currentTimeMillis();
 

@@ -22,7 +22,7 @@ public class JarDecryptor {
      * @param password    密码
      * @return 解密后的字节
      */
-    public byte[] doDecrypt(String encryptFile, String className, String password) {
+    public byte[] doDecrypt(String encryptFile, String className, char[] password) {
         long t1 = System.currentTimeMillis();
 
         String classFile = "META-INF/" + Const.FILE_NAME + "/" + className;
@@ -43,7 +43,7 @@ public class JarDecryptor {
             return null;
         }
 
-        bytes = EncryptUtils.de(bytes, password + className, 1);
+        bytes = EncryptUtils.de(bytes, IoUtils.merger(password, className.toCharArray()), 1);
 
         if (Const.DEBUG) {
             long t2 = System.currentTimeMillis();

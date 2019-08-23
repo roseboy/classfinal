@@ -93,8 +93,19 @@ public class CmdLineOption {
      * otherwise null.
      */
     public String getOptionValue(String opt) {
+        return getOptionValue(opt, null);
+    }
+
+    /**
+     * Retrieve the first argument, if any, of this option.
+     *
+     * @param opt the name of the option
+     * @return Value of the argument if option is set, and has an argument,
+     * otherwise null.
+     */
+    public String getOptionValue(String opt, String dv) {
         String[] values = getOptionValues(opt);
-        return (values == null) ? null : values[0];
+        return (values == null) ? dv : values[0];
     }
 
     /**

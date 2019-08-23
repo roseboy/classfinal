@@ -13,7 +13,7 @@ import java.security.ProtectionDomain;
  */
 public class AgentTransformer implements ClassFileTransformer {
     //密码
-    private String pwd = null;
+    private char[] pwd = null;
     //解密
     JarDecryptor decryptor = null;
 
@@ -22,7 +22,7 @@ public class AgentTransformer implements ClassFileTransformer {
      *
      * @param pwd 密码
      */
-    public AgentTransformer(String pwd) {
+    public AgentTransformer(char[] pwd) {
         this.pwd = pwd;
         decryptor = new JarDecryptor();
     }

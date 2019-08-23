@@ -1,6 +1,10 @@
 package net.roseboy.classfinal.util;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.CRC32;
 
@@ -38,7 +42,7 @@ public class IoUtils {
     public static byte[] readFileToByte(File file) {
         try {
             FileInputStream inputStream = new FileInputStream(file);
-            return toByteArray(inputStream);
+            return toBytes(inputStream);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -52,7 +56,7 @@ public class IoUtils {
      * @return 字节
      * @throws IOException IOException
      */
-    public static byte[] toByteArray(InputStream input) throws IOException {
+    public static byte[] toBytes(InputStream input) throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         try {
             byte[] buffer = new byte[4096];
@@ -64,6 +68,22 @@ public class IoUtils {
         } finally {
             close(output, input);
         }
+    }
+
+    /**
+     * 字符数组转成字节数组
+     *
+     * @param chars 字符数组
+     * @return 字节数组
+     */
+    public static byte[] toBytes(char[] chars) {
+        CharBuffer charBuffer = CharBuffer.wrap(chars);
+        ByteBuffer byteBuffer = Charset.forName("UTF-8").encode(charBuffer);
+        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
+                byteBuffer.position(), byteBuffer.limit());
+        Arrays.fill(charBuffer.array(), '\u0000'); // clear sensitive data
+        Arrays.fill(byteBuffer.array(), (byte) 0); // clear sensitive data
+        return bytes;
     }
 
     /**
@@ -225,4 +245,47 @@ public class IoUtils {
             IoUtils.close(out);
         }
     }
+
+    /**
+     * 合并byte[]
+     *
+     * @param bts 字节数组
+     * @return 合并后的字节
+     */
+    public static byte[] merger(byte[]... bts) {
+        int lenght = 0;
+        for (byte[] b : bts) {
+            lenght += b.length;
+        }
+
+        byte[] bt = new byte[lenght];
+        int lastLength = 0;
+        for (byte[] b : bts) {
+            System.arraycopy(b, 0, bt, lastLength, b.length);
+            lastLength = b.length;
+        }
+        return bt;
+    }
+
+    /**
+     * 合并byte[]
+     *
+     * @param bts 字节数组
+     * @return 合并后的字节
+     */
+    public static char[] merger(char[]... bts) {
+        int lenght = 0;
+        for (char[] b : bts) {
+            lenght += b.length;
+        }
+
+        char[] bt = new char[lenght];
+        int lastLength = 0;
+        for (char[] b : bts) {
+            System.arraycopy(b, 0, bt, lastLength, b.length);
+            lastLength = b.length;
+        }
+        return bt;
+    }
+
 }

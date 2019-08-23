@@ -1,5 +1,7 @@
 package net.roseboy.classfinal.util;
 
+import org.omg.IOP.Encoding;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
@@ -8,6 +10,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +22,7 @@ import java.util.Map;
  */
 public class EncryptUtils {
     //盐
-    private static final String SALT = "whoisyourdaddy#$@#@";
+    private static final char[] SALT = {'w', 'h', 'o', 'i', 's', 'y', 'o', 'u', 'r', 'd', 'a', 'd', 'd', 'y', '#', '$', '@', '#', '@'};
     //rsa 长度
     private static int KEY_LENGTH = 1024;
 
@@ -31,9 +34,9 @@ public class EncryptUtils {
      * @param type 类型
      * @return 密文
      */
-    public static byte[] en(byte[] msg, String key, int type) {
+    public static byte[] en(byte[] msg, char[] key, int type) {
         if (type == 1) {
-            return enAES(msg, md5(key + SALT));
+            return enAES(msg, md5(IoUtils.merger(key, SALT)));
         }
         return enSimple(msg, key);
     }
@@ -46,32 +49,11 @@ public class EncryptUtils {
      * @param type 类型
      * @return 明文
      */
-    public static byte[] de(byte[] msg, String key, int type) {
+    public static byte[] de(byte[] msg, char[] key, int type) {
         if (type == 1) {
-            return deAES(msg, md5(key + SALT));
+            return deAES(msg, md5(IoUtils.merger(key, SALT)));
         }
         return deSimple(msg, key);
-    }
-
-    /**
-     * 合并byte[]
-     *
-     * @param bts 字节数组
-     * @return 合并后的字节
-     */
-    private static byte[] merger(byte[]... bts) {
-        int lenght = 0;
-        for (byte[] b : bts) {
-            lenght += b.length;
-        }
-
-        byte[] bt = new byte[lenght];
-        int lastLength = 0;
-        for (byte[] b : bts) {
-            System.arraycopy(b, 0, bt, lastLength, b.length);
-            lastLength = b.length;
-        }
-        return bt;
     }
 
     /**
@@ -80,11 +62,12 @@ public class EncryptUtils {
      * @param str 字符串
      * @return md5字串
      */
-    public static byte[] md5byte(String str) {
+    public static byte[] md5byte(char[] str) {
         byte[] b = null;
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update(str.getBytes());
+            byte[] buffer = IoUtils.toBytes(str);
+            md.update(buffer);
             b = md.digest();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -98,14 +81,14 @@ public class EncryptUtils {
      * @param str 字串
      * @return 32位md5
      */
-    public static String md5(String str) {
-        String result = "";
+    public static char[] md5(char[] str) {
         byte s[] = md5byte(str);
         if (s == null) {
-            return result;
+            return null;
         }
+        char[] result = new char[0];
         for (int i = 0; i < s.length; i++) {
-            result += Integer.toHexString((0x000000FF & s[i]) | 0xFFFFFF00).substring(6);
+            result = IoUtils.merger(result, Integer.toHexString((0x000000FF & s[i]) | 0xFFFFFF00).substring(6).toCharArray());
         }
         return result;
     }
@@ -120,8 +103,8 @@ public class EncryptUtils {
      * @param key   密钥
      * @return 加密后的字节
      */
-    public static byte[] enSimple(byte[] msg, int start, int end, String key) {
-        byte[] keys = merger(md5byte(key + SALT), md5byte(SALT + key));
+    public static byte[] enSimple(byte[] msg, int start, int end, char[] key) {
+        byte[] keys = IoUtils.merger(md5byte(IoUtils.merger(key, SALT)), md5byte(IoUtils.merger(SALT, key)));
         for (int i = start; i <= end; i++) {
             msg[i] = (byte) (msg[i] ^ keys[i % keys.length]);
         }
@@ -137,8 +120,8 @@ public class EncryptUtils {
      * @param key   密钥
      * @return 解密后的字节
      */
-    public static byte[] deSimple(byte[] msg, int start, int end, String key) {
-        byte[] keys = merger(md5byte(key + SALT), md5byte(SALT + key));
+    public static byte[] deSimple(byte[] msg, int start, int end, char[] key) {
+        byte[] keys = IoUtils.merger(md5byte(IoUtils.merger(key, SALT)), md5byte(IoUtils.merger(SALT, key)));
         for (int i = start; i <= end; i++) {
             msg[i] = (byte) (msg[i] ^ keys[i % keys.length]);
         }
@@ -152,7 +135,7 @@ public class EncryptUtils {
      * @param key 密钥
      * @return 加密后的字节
      */
-    public static byte[] enSimple(byte[] msg, String key) {
+    public static byte[] enSimple(byte[] msg, char[] key) {
         return enSimple(msg, 0, msg.length - 1, key);
     }
 
@@ -163,7 +146,7 @@ public class EncryptUtils {
      * @param key 密钥
      * @return 解密后的字节
      */
-    public static byte[] deSimple(byte[] msg, String key) {
+    public static byte[] deSimple(byte[] msg, char[] key) {
         return deSimple(msg, 0, msg.length - 1, key);
     }
 
@@ -282,7 +265,7 @@ public class EncryptUtils {
             }
             in[i % in_length] = msg[i];
             if (i == (msg.length - 1) || (i % in_length + 1 == in_length)) {
-                out = merger(out, cipher.doFinal(in));
+                out = IoUtils.merger(out, cipher.doFinal(in));
             }
         }
         return out;
@@ -322,7 +305,7 @@ public class EncryptUtils {
      * @param key 密钥
      * @return 加密结果
      */
-    public static String enAES(String str, String key) {
+    public static String enAES(String str, char[] key) {
         byte[] encrypted = null;
         try {
             encrypted = enAES(str.getBytes("utf-8"), key);
@@ -339,10 +322,10 @@ public class EncryptUtils {
      * @param key 密钥
      * @return 加密后的字节
      */
-    public static byte[] enAES(byte[] msg, String key) {
+    public static byte[] enAES(byte[] msg, char[] key) {
         byte[] encrypted = null;
         try {
-            byte[] raw = key.getBytes("utf-8");
+            byte[] raw = IoUtils.toBytes(key);
             SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");//"算法/模式/补码方式"
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
@@ -360,7 +343,7 @@ public class EncryptUtils {
      * @param key 密钥
      * @return 明文字串
      */
-    public static String deAES(String str, String key) {
+    public static String deAES(String str, char[] key) {
         String originalString = null;
         byte[] msg = Base64.getDecoder().decode(str);
         byte[] original = deAES(msg, key);
@@ -379,10 +362,10 @@ public class EncryptUtils {
      * @param key 密钥
      * @return 明文字节
      */
-    public static byte[] deAES(byte[] msg, String key) {
+    public static byte[] deAES(byte[] msg, char[] key) {
         byte[] original = null;
         try {
-            byte[] raw = key.getBytes("utf-8");
+            byte[] raw = IoUtils.toBytes(key);
             SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, skeySpec);
@@ -417,10 +400,10 @@ public class EncryptUtils {
 //        System.out.println("明文:" + messageDe);
 
 
-        System.out.println("明文:" + message);
-        String m = enAES(message, md5("admin"));
-        System.out.println("密文:" + m);
-        System.out.println("明文:" + deAES(m, md5("admin")));
-        System.out.println("md5:" + md5("admin"));
+//        System.out.println("明文:" + message);
+//        String m = enAES(message, md5("admin"));
+//        System.out.println("密文:" + m);
+//        System.out.println("明文:" + deAES(m, md5("admin")));
+        System.out.println("md5:" + md5("admin".toCharArray()));
     }
 }

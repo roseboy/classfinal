@@ -116,7 +116,7 @@ public class Main {
 
                 //加密过程
                 System.out.println("处理中...");
-                JarEncryptor decryptor = new JarEncryptor(path, password, packageList, includeJarList, excludeClassList);
+                JarEncryptor decryptor = new JarEncryptor(path, password.toCharArray(), packageList, includeJarList, excludeClassList);
                 String result = decryptor.doEncryptJar();
                 System.out.println("加密完成，请牢记密码！");
                 System.out.println(result);
