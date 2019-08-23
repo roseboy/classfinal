@@ -79,7 +79,7 @@ maven插件的参数名称与直接运行的参数相同，请参考上节的参
 
 ### 启动加密后的jar
 
-加密后的项目需要设置javaagent来启动项目，项目在启动过程中解密class，完全内存解密，不留下任何解密后的文件。
+加密后的项目需要设置javaagent来启动，项目在启动过程中解密class，完全内存解密，不留下任何解密后的文件。
 
 解密功能已经自动加入到 yourpaoject-encrypted.jar中，所以启动时-javaagent与-jar相同，不需要额外的jar包。
 
@@ -100,7 +100,7 @@ java -javaagent:yourpaoject-encrypted.jar -jar yourpaoject-encrypted.jar
 
 ### tomcat下运行加密后的war
 
-将加密后的war放在tomcat/webapps下
+将加密后的war放在tomcat/webapps下，
 tomcat/bin/catalina 增加以下配置:
 
 ```sh
