@@ -101,7 +101,9 @@ public class EncryptUtils {
     public static String md5(String str) {
         String result = "";
         byte s[] = md5byte(str);
-
+        if (s == null) {
+            return result;
+        }
         for (int i = 0; i < s.length; i++) {
             result += Integer.toHexString((0x000000FF & s[i]) | 0xFFFFFF00).substring(6);
         }

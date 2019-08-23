@@ -187,9 +187,10 @@ public class IoUtils {
     public static String readTxtFile(File file) {
         StringBuffer txt = new StringBuffer("");
         InputStreamReader read = null;
+        BufferedReader bufferedReader = null;
         try {
             read = new InputStreamReader(new FileInputStream(file), "UTF-8");
-            BufferedReader bufferedReader = new BufferedReader(read);
+            bufferedReader = new BufferedReader(read);
             String lineTxt;
             while ((lineTxt = bufferedReader.readLine()) != null) {
                 txt.append(lineTxt).append("\r\n");
@@ -198,7 +199,7 @@ public class IoUtils {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            IoUtils.close(read);
+            IoUtils.close(bufferedReader, read);
         }
         return txt.toString();
     }
