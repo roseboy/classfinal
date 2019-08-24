@@ -109,7 +109,7 @@ CATALINA_OPTS="$CATALINA_OPTS -javaagent:classfinal-fatjar.jar='-pwd 0000000'";
 export CATALINA_OPTS;
 
 //win下catalina.bat
-set CATALINA_OPTS="%CATALINA_OPTS% -javaagent:classfinal-fatjar.jar='-pwd 0000000'"
+set JAVA_OPTS="-javaagent:classfinal-fatjar.jar='-pwd 000000'"
 
 //参数说明 -pwd   加密项目的密码  
 
