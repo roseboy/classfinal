@@ -1,6 +1,10 @@
 package net.roseboy.classfinal;
 
+import net.roseboy.classfinal.util.Log;
+import net.roseboy.classfinal.util.StrUtils;
+
 import java.lang.instrument.ClassFileTransformer;
+import java.net.URISyntaxException;
 import java.security.Permission;
 import java.security.ProtectionDomain;
 
@@ -34,18 +38,9 @@ public class AgentTransformer implements ClassFileTransformer {
             return classfileBuffer;
         }
 
-        Permission permission = protectionDomain.getPermissions().elements().nextElement();
-        String encryptFile = permission.getName();
-        //war包解压后的WEB-INF/classes目录
-        if (encryptFile.endsWith("-") && encryptFile.contains("WEB-INF") && encryptFile.contains("classes")) {
-            encryptFile = encryptFile.substring(0, encryptFile.indexOf("WEB-INF"));
-        }
-        //war包解压后WEB-INF/lib
-        else if (encryptFile.endsWith(".jar") && encryptFile.contains("WEB-INF") && encryptFile.contains("lib")) {
-            encryptFile = encryptFile.substring(0, encryptFile.indexOf("WEB-INF"));
-        }
-        //tomcat home 下的bin或lib
-        else if (encryptFile.contains("lib") || encryptFile.contains("bin")) {
+        String encryptFile = projectPath(protectionDomain);
+        Log.debug(className + "==>" + encryptFile);
+        if (StrUtils.isEmpty(encryptFile)) {
             return classfileBuffer;
         }
 
@@ -57,6 +52,43 @@ public class AgentTransformer implements ClassFileTransformer {
             return bytes;
         }
         return classfileBuffer;
+
+    }
+
+    /**
+     * 获取项目运行的路径
+     *
+     * @param protectionDomain protectionDomain
+     * @return 路径
+     */
+    private String projectPath(ProtectionDomain protectionDomain) {
+        String path = null;
+        try {
+            path = protectionDomain.getCodeSource().getLocation().toURI().getPath();
+        } catch (URISyntaxException e) {
+
+        }
+        if (path == null) {
+            path = protectionDomain.getCodeSource().getLocation().getPath();
+        }
+
+        //war包解压后的WEB-INF/classes目录
+        if (path.contains("WEB-INF") && path.contains("classes")) {
+            return path.substring(0, path.indexOf("WEB-INF"));
+        }
+        //war包解压后WEB-INF/lib
+        else if (path.endsWith(".jar") && path.contains("WEB-INF") && path.contains("lib")) {
+            return path.substring(0, path.indexOf("WEB-INF"));
+        }
+        //spring-boot项目
+        else if (path.startsWith("file:") && path.contains("BOOT-INF")) {
+            return path.substring(5, path.indexOf("BOOT-INF") - 2);
+        }
+        //普通jar
+        else if (path.endsWith(".jar")) {
+            return path;
+        }
+        return null;
 
     }
 }
