@@ -251,7 +251,7 @@ public class JarEncryptor {
         paths.add(p1);
         paths.add(p2);
         for (String path : paths) {
-            if (path.endsWith("-")) {
+            if (path.endsWith("classes" + File.separator)) {
                 List<File> files = new ArrayList<>();
                 path = path.substring(0, path.length() - 1);
                 IoUtils.listFile(files, new File(path));
