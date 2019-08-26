@@ -3,7 +3,9 @@ package net.roseboy.classfinal;
 import net.roseboy.classfinal.util.CmdLineOption;
 
 import java.io.Console;
+import java.io.InputStream;
 import java.lang.instrument.Instrumentation;
+import java.util.Arrays;
 
 /**
  * 监听类加载
@@ -37,14 +39,18 @@ public class CoreAgent {
         if (pwd == null || pwd.length == 0) {
             Console console = System.console();
             if (console == null) {
-                System.out.println("\nStartup failed,invalid password.\n");
-                System.exit(0);
+                InputForm input = new InputForm();
+                input.showForm();
+                pwd = input.nextPasswordLine();
+                input.closeForm();
+                //System.out.println("\nStartup failed,invalid password.\n");
+                //System.exit(0);
+            } else {
+                pwd = console.readPassword("Password:");
             }
-            pwd = console.readPassword("Password:");
         }
 
         AgentTransformer tran = new AgentTransformer(pwd);
         inst.addTransformer(tran);
     }
-
 }
