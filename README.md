@@ -24,7 +24,7 @@ JDK 1.8 +
 ## 使用说明
 
 ### 下载
-[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.1.1/classfinal-fatjar-1.1.1.jar)
+[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.1.2/classfinal-fatjar-1.1.2.jar)
 
 ### 加密
 
@@ -51,14 +51,14 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
 
 ### maven插件方式
 
-在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.1。
+在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.2。
 ```xml
 <plugin>
     <groupId>net.roseboy</groupId>
     <artifactId>classfinal-maven-plugin</artifactId>
     <version>${classfinal.version}</version>
     <configuration>
-        <password>000000</password>
+        <password>000000</password><!--加密打包之后pom.xml会被删除，不用担心在jar包里找到此密码-->
         <packages>com.yourpackage,com.yourpackage2</packages>
         <excludes>org.spring</excludes>
         <libjars>a.jar,b.jar</libjars>
@@ -127,8 +127,9 @@ set JAVA_OPTS="-javaagent:classfinal-fatjar.jar='-pwd 000000'"
 
 ## 版本说明
 
+* v1.1.2 修复windows下加密后不能启动的问题
 * v1.1.1 启动jar时在控制台输入密码，无需将密码放在参数中
-* v1.1.0 加密jar包时将解密代码加入加密后的jar包，无需在使用多余的jar文件
+* v1.1.0 加密jar包时将解密代码加入加密后的jar包，无需使用多余的jar文件
 * v1.0.0 第一个正式版发布
 
 ## 协议声明

@@ -47,6 +47,7 @@ public class JarUtils {
                     continue;
                 }
                 String fileName = file.getAbsolutePath().substring(jarDirFile.getAbsolutePath().length() + 1);
+                fileName=fileName.replace(File.separator, "/");
                 //目录，添加一个目录entry
                 if (file.isDirectory()) {
                     ZipEntry ze = new ZipEntry(fileName + "/");
