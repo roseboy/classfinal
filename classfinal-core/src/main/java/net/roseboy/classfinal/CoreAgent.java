@@ -3,9 +3,7 @@ package net.roseboy.classfinal;
 import net.roseboy.classfinal.util.CmdLineOption;
 
 import java.io.Console;
-import java.io.InputStream;
 import java.lang.instrument.Instrumentation;
-import java.util.Arrays;
 
 /**
  * 监听类加载
@@ -50,7 +48,9 @@ public class CoreAgent {
             }
         }
 
-        AgentTransformer tran = new AgentTransformer(pwd);
-        inst.addTransformer(tran);
+        if (inst != null) {
+            AgentTransformer tran = new AgentTransformer(pwd);
+            inst.addTransformer(tran);
+        }
     }
 }
