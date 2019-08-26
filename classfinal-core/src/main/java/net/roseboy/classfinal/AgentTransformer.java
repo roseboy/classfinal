@@ -39,7 +39,7 @@ public class AgentTransformer implements ClassFileTransformer {
         }
 
         String encryptFile = projectPath(protectionDomain);
-        Log.debug(className + "==>" + encryptFile);
+        //Log.debug(className + "==>" + encryptFile);
         if (StrUtils.isEmpty(encryptFile)) {
             return classfileBuffer;
         }
@@ -71,18 +71,17 @@ public class AgentTransformer implements ClassFileTransformer {
         if (path == null) {
             path = protectionDomain.getCodeSource().getLocation().getPath();
         }
-
-        //war包解压后的WEB-INF/classes目录
-        if (path.contains("WEB-INF") && path.contains("classes")) {
-            return path.substring(0, path.indexOf("WEB-INF"));
+        if (path.startsWith("file:")) {
+            path = path.substring(5);
         }
-        //war包解压后WEB-INF/lib
-        else if (path.endsWith(".jar") && path.contains("WEB-INF") && path.contains("lib")) {
+
+        //war包解压后的WEB-INF/classes目录 或 war包解压后WEB-INF/lib
+        if (path.contains("WEB-INF")) {
             return path.substring(0, path.indexOf("WEB-INF"));
         }
         //spring-boot项目
-        else if (path.startsWith("file:") && path.contains("BOOT-INF")) {
-            return path.substring(5, path.indexOf("BOOT-INF") - 2);
+        else if (path.contains("BOOT-INF")) {
+            return path.substring(0, path.indexOf("BOOT-INF") - 2);
         }
         //普通jar
         else if (path.endsWith(".jar")) {
