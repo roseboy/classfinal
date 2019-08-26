@@ -126,7 +126,6 @@ public class JarUtils {
                 if (excludeFiles != null && (excludeFiles.contains(entry.getName()) || excludeFiles.contains(targetFile.getName()))) {
                     continue;
                 }
-                list.add(targetFile.getAbsolutePath());
 
                 //释放jar文件，如果在includeJars中，递归释放jar内的文件
                 if (entry.getName().endsWith(".jar")) {
@@ -151,6 +150,7 @@ public class JarUtils {
                     byte[] bytes = IoUtils.toBytes(zipFile.getInputStream(entry));
                     IoUtils.writeFile(targetFile, bytes);
                 }
+                list.add(targetFile.getAbsolutePath());
             }
         } catch (Exception e) {
             e.printStackTrace();

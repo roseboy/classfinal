@@ -10,7 +10,6 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +35,7 @@ public class EncryptUtils {
      */
     public static byte[] en(byte[] msg, char[] key, int type) {
         if (type == 1) {
-            return enAES(msg, md5(IoUtils.merger(key, SALT)));
+            return enAES(msg, md5(IoUtils.merger(key, SALT), true));
         }
         return enSimple(msg, key);
     }
@@ -51,7 +50,7 @@ public class EncryptUtils {
      */
     public static byte[] de(byte[] msg, char[] key, int type) {
         if (type == 1) {
-            return deAES(msg, md5(IoUtils.merger(key, SALT)));
+            return deAES(msg, md5(IoUtils.merger(key, SALT), true));
         }
         return deSimple(msg, key);
     }
@@ -82,12 +81,29 @@ public class EncryptUtils {
      * @return 32位md5
      */
     public static char[] md5(char[] str) {
+        return md5(str, false);
+    }
+
+    /**
+     * md5
+     *
+     * @param str   字串
+     * @param sh0rt 是否16位
+     * @return 32位/16位md5
+     */
+    public static char[] md5(char[] str, boolean sh0rt) {
         byte s[] = md5byte(str);
         if (s == null) {
             return null;
         }
+        int begin = 0;
+        int end = s.length;
+        if (sh0rt) {
+            begin = 8;
+            end = 16;
+        }
         char[] result = new char[0];
-        for (int i = 0; i < s.length; i++) {
+        for (int i = begin; i < end; i++) {
             result = IoUtils.merger(result, Integer.toHexString((0x000000FF & s[i]) | 0xFFFFFF00).substring(6).toCharArray());
         }
         return result;
@@ -400,10 +416,10 @@ public class EncryptUtils {
 //        System.out.println("明文:" + messageDe);
 
 
-//        System.out.println("明文:" + message);
-//        String m = enAES(message, md5("admin"));
-//        System.out.println("密文:" + m);
-//        System.out.println("明文:" + deAES(m, md5("admin")));
-        System.out.println("md5:" + md5("admin".toCharArray()));
+        System.out.println("明文:" + message);
+        String m = enAES(message, md5("admin".toCharArray(), true));
+        System.out.println("密文:" + m);
+        System.out.println("明文:" + deAES(m, md5("admin".toCharArray(), true)));
+        //System.out.println("md5:" + md5("admin".toCharArray()));
     }
 }
