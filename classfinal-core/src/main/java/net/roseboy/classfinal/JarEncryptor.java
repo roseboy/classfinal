@@ -226,6 +226,9 @@ public class JarEncryptor {
             }
             String jarFile = this.targetLibDir.getAbsolutePath() + File.separator + jar;
             String jarDir = jarFile.substring(0, jarFile.length() - 4) + Const.LIB_JAR_DIR;
+            if (!new File(jarDir).exists()) {
+                continue;
+            }
             JarUtils.doJar(jarDir, jarFile);
             IoUtils.delete(new File(jarDir));
         }

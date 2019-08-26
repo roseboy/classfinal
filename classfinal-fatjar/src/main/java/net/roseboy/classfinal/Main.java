@@ -77,7 +77,7 @@ public class Main {
                 //spring web war
                 //path = "/Users/roseboy/work-yiyon/北大口腔/erpbeidakouqiang/target/erpbeidakouqiang-1.0.0.war";
 
-                libjars = "yiyon-basedata-1.0.0.jar,jeee-admin-1.0.0.jar,aspectjweaver-1.8.13.jar";
+                libjars = "yiyon-basedata-1.0.0.jar,jeee-admin-1.0.0.jar,aspectjweaver-1.8.13.jar,a.jar";
                 packages = "com.yiyon,net.roseboy,yiyon";//包名过滤
                 excludeClass = "org.spring";//排除的类
                 password = "123456";
