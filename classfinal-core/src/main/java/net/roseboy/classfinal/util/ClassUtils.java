@@ -130,7 +130,7 @@ public class ClassUtils {
     /**
      * 判断是否是某个包名
      *
-     * @param encryptPackage 允许的包名，多个用逗号隔开
+     * @param encryptPackage 允许的包名
      * @param className      要判断的类名
      * @return 是否属于
      */
@@ -141,6 +141,26 @@ public class ClassUtils {
 
         for (String pkg : encryptPackage) {
             if (className.startsWith(pkg)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否是某个类名
+     *
+     * @param classes   过滤的类名
+     * @param className 要判断的类名
+     * @return 是否属于
+     */
+    public static boolean isClass(List<String> classes, String className) {
+        if (classes == null || classes.size() == 0) {
+            return false;
+        }
+
+        for (String cls : classes) {
+            if (className.endsWith(cls)) {
                 return true;
             }
         }

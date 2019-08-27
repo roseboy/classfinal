@@ -145,8 +145,7 @@ public class JarEncryptor {
             //解析出类全名
             String className = resolveClassName(file, true);
             //判断包名相同和是否排除的类
-            if (ClassUtils.isPackage(this.packages, className)
-                    && (this.excludeClass == null || !this.excludeClass.contains(className))) {
+            if (ClassUtils.isPackage(this.packages, className) && !ClassUtils.isClass(this.excludeClass, className)) {
                 classFiles.add(new File(file));
             }
         }

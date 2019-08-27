@@ -22,7 +22,7 @@ public class CoreAgent {
      * @throws Exception Exception
      */
     public static void premain(String args, Instrumentation inst) throws Exception {
-        Const.printDog();
+        Const.pringInfo();
         CmdLineOption options = new CmdLineOption();
         options.addOption("pwd", true, "密码");
         options.addOption("debug", false, "调试模式");

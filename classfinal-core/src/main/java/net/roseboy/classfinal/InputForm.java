@@ -2,8 +2,8 @@ package net.roseboy.classfinal;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.Arrays;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 /**
  * 密码输入界面，模拟命令行输入
@@ -16,11 +16,11 @@ public class InputForm {
     //窗口
     private final JDialog frame = new JDialog();
     //文本域
-    JTextArea text = new JTextArea();
+    private JTextArea text = new JTextArea();
     //已输入字符长度
-    int keyIndex = 0;
+    private int keyIndex = 0;
     //已输入的字符，最长100
-    char[] password = new char[100];
+    private char[] password = new char[100];
     //是否有下一行
     boolean hasNextLine = false;
 
@@ -84,7 +84,7 @@ public class InputForm {
     /**
      * 键盘监听事件
      *
-     * @return
+     * @return KeyAdapter
      */
     private KeyAdapter getKeyAdapter() {
         return new KeyAdapter() {
