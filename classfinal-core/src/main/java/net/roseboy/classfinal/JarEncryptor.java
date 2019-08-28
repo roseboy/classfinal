@@ -72,16 +72,24 @@ public class JarEncryptor {
         if (!jarPath.endsWith(".jar") && !jarPath.endsWith(".war")) {
             throw new RuntimeException("jar/war文件格式有误");
         }
+        if (!new File(jarPath).exists()) {
+            throw new RuntimeException("文件不存在:" + jarPath);
+        }
         if (password == null || password.length == 0) {
             throw new RuntimeException("密码不能为空");
         }
         this.jarOrWar = jarPath.substring(jarPath.lastIndexOf(".") + 1);
+        Log.debug("加密类型：" + jarOrWar);
         //临时work目录
         this.targetDir = new File(jarPath.replace("." + jarOrWar, Const.LIB_JAR_DIR));
         this.targetLibDir = new File(this.targetDir, ("jar".equals(jarOrWar) ? "BOOT-INF" : "WEB-INF") + File.separator + "lib");
+        Log.debug("临时目录：" + targetDir);
 
         //[1]释放所有文件，内部jar只释放需要加密的jar
         List<String> allFile = JarUtils.unJar(jarPath, this.targetDir.getAbsolutePath(), includeJars);
+        for (String s : allFile) {
+            Log.debug("释放：" + s);
+        }
 
         //[2]提取所有需要加密的class文件
         List<File> classFiles = filterClasses(allFile);
@@ -94,11 +102,6 @@ public class JarEncryptor {
         //[4]将正常的class加密，压缩另存
         List<String> encryptClass = encryptClass(classFiles);
         encryptFileCount = encryptClass.size();
-        if (Const.DEBUG) {
-            for (String s : encryptClass) {
-                Log.debug("加密文件：" + s);
-            }
-        }
 
         //[5]修改class方法体，并保存文件
         clearClassMethod(classFiles);
@@ -147,6 +150,7 @@ public class JarEncryptor {
             //判断包名相同和是否排除的类
             if (ClassUtils.isPackage(this.packages, className) && !ClassUtils.isClass(this.excludeClass, className)) {
                 classFiles.add(new File(file));
+                Log.debug("待加密: " + file);
             }
         }
         return classFiles;
@@ -175,6 +179,7 @@ public class JarEncryptor {
             File targetFile = new File(metaDir, className);
             IoUtils.writeFile(targetFile, bytes);
             encryptClasses.add(className);
+            Log.debug("加密：" + className);
         }
 
         return encryptClasses;
@@ -191,6 +196,7 @@ public class JarEncryptor {
             ClassPool pool = ClassPool.getDefault();
             //lib目录
             ClassUtils.loadClassPath(pool, new File[]{this.targetLibDir});
+            Log.debug("ClassPath: " + this.targetLibDir);
             List<String> classPaths = new ArrayList<>();
             for (File classFile : classFiles) {
                 //要修改的class所在的目录
@@ -198,14 +204,21 @@ public class JarEncryptor {
                 if (!classPaths.contains(classPath)) {
                     pool.insertClassPath(classPath);
                     classPaths.add(classPath);
+                    Log.debug("ClassPath: " + classPath);
                 }
 
                 //解析出类全名
                 String className = resolveClassName(classFile.getAbsolutePath(), true);
                 //修改class方法体，并保存文件
-                byte[] bts = ClassUtils.rewriteAllMethods(pool, className);
+                byte[] bts = null;
+                try {
+                    bts = ClassUtils.rewriteAllMethods(pool, className);
+                } catch (Exception e) {
+                    Log.debug("ERROR:" + e.getMessage());
+                }
                 if (bts != null) {
                     IoUtils.writeFile(classFile, bts);
+                    Log.debug("清除方法体: " + className);
                 }
             }
         } catch (Exception e) {
@@ -232,6 +245,7 @@ public class JarEncryptor {
             }
             JarUtils.doJar(jarDir, jarFile);
             IoUtils.delete(new File(jarDir));
+            Log.debug("打包: " + jarFile);
         }
 
         //删除meta-inf下的maven
@@ -241,7 +255,7 @@ public class JarEncryptor {
         String enctyptedJar = jarPath.replace("." + jarOrWar, "-encrypted." + jarOrWar);
         String result = JarUtils.doJar(this.targetDir.getAbsolutePath(), enctyptedJar);
         IoUtils.delete(this.targetDir);
-
+        Log.debug("打包: " + enctyptedJar);
         return result;
     }
 
@@ -255,12 +269,18 @@ public class JarEncryptor {
         paths.add(p1);
         paths.add(p2);
         for (String path : paths) {
-            if (path.endsWith("classes" + File.separator)) {
+            if (path.endsWith(".jar")) {
+                List<String> excludeFiles = new ArrayList<>();
+                excludeFiles.add("META-INF/MANIFEST.MF");
+                excludeFiles.add("说明.txt");
+                JarUtils.unJar(path, this.targetDir.getAbsolutePath(), null, excludeFiles);
+            } else if (path.endsWith("/classes/")) {
                 List<File> files = new ArrayList<>();
-                path = path.substring(0, path.length() - 1);
+                File pathFile = new File(path);
                 IoUtils.listFile(files, new File(path));
                 for (File file : files) {
-                    File targetFile = new File(this.targetDir, file.getAbsolutePath().replace(path, ""));
+                    path = file.getAbsolutePath().substring(pathFile.getAbsolutePath().length());
+                    File targetFile = new File(this.targetDir, path);
                     if (file.isDirectory()) {
                         targetFile.mkdirs();
                     } else {
@@ -268,11 +288,6 @@ public class JarEncryptor {
                         IoUtils.writeFile(targetFile, bytes);
                     }
                 }
-            } else if (path.endsWith(".jar")) {
-                List<String> excludeFiles = new ArrayList<>();
-                excludeFiles.add("META-INF/MANIFEST.MF");
-                excludeFiles.add("说明.txt");
-                JarUtils.unJar(path, this.targetDir.getAbsolutePath(), null, excludeFiles);
             }
         }
 

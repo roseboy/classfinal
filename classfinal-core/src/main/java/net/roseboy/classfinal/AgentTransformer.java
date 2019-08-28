@@ -17,7 +17,7 @@ public class AgentTransformer implements ClassFileTransformer {
     //密码
     private char[] pwd;
     //解密
-    JarDecryptor decryptor;
+    private final JarDecryptor decryptor = new JarDecryptor();
 
     /**
      * 构造方法
@@ -26,7 +26,6 @@ public class AgentTransformer implements ClassFileTransformer {
      */
     public AgentTransformer(char[] pwd) {
         this.pwd = pwd;
-        decryptor = new JarDecryptor();
     }
 
     @Override

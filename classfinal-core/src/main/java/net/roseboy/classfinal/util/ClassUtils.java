@@ -6,6 +6,7 @@ import javassist.compiler.CompileError;
 import javassist.compiler.Javac;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,14 +34,13 @@ public class ClassUtils {
                 name = m.getName();
                 //不是构造方法，在当前类，不是父lei
                 if (!m.getName().contains("<") && m.getLongName().startsWith(cc.getName())) {
-                    //System.out.println(m.getLongName());
                     //m.setBody(null);//清空方法体
                     CodeAttribute ca = m.getMethodInfo().getCodeAttribute();
                     //接口的ca就是null,方法体本来就是空的就是-79
                     if (ca != null && ca.getCodeLength() != 1 && ca.getCode()[0] != -79) {
                         ClassUtils.setBodyKeepParamInfos(m, null, true);
                         if ("void".equalsIgnoreCase(m.getReturnType().getName()) && m.getLongName().endsWith(".main(java.lang.String[])") && m.getMethodInfo().getAccessFlags() == 9) {
-                            m.insertBefore("System.out.println(\"\\nStartup failed,invalid password.\\n\");");
+                            m.insertBefore("System.out.println(\"\\nStartup failed, invalid password.\\n\");");
                         }
 
                     }
@@ -49,10 +49,8 @@ public class ClassUtils {
             }
             return cc.toBytecode();
         } catch (Exception e) {
-            //e.printStackTrace();
-            System.out.println("ERROR:[" + classname + "(" + name + ")]" + e.getMessage());
+            throw new RuntimeException("[" + classname + "(" + name + ")]" + e.getMessage());
         }
-        return null;
     }
 
     /**
@@ -165,5 +163,28 @@ public class ClassUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * 获取class运行的classes目录或所在的jar包目录
+     *
+     * @return 路径字符串
+     */
+    public static String getRootPath() {
+        String path = ClassUtils.class.getResource("").getPath();
+        try {
+            path = java.net.URLDecoder.decode(path, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+        }
+        if (path.startsWith("file:")) {
+            path = path.substring(5);
+        }
+        if (path.contains("!")) {
+            path = path.substring(0, path.indexOf("!"));
+        }
+        if (path.contains("/classes/")) {
+            path = path.substring(0, path.indexOf("/classes/") + 9);
+        }
+        return path;
     }
 }

@@ -45,10 +45,9 @@ public class JarDecryptor {
 
         bytes = EncryptUtils.de(bytes, IoUtils.merger(password, className.toCharArray()), 1);
 
-        if (Const.DEBUG) {
-            long t2 = System.currentTimeMillis();
-            Log.debug("解密文件: " + className + " (" + (t2 - t1) + " ms)");
-        }
+        long t2 = System.currentTimeMillis();
+        Log.debug("解密: " + className + " (" + (t2 - t1) + " ms)");
+
         return bytes;
 
     }

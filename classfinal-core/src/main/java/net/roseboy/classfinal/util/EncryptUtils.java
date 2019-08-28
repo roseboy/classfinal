@@ -389,35 +389,4 @@ public class EncryptUtils {
         }
         return original;
     }
-
-    /**
-     * 加密测试
-     *
-     * @param args 参数
-     * @throws Exception Exception
-     */
-    public static void main(String[] args) throws Exception {
-        //加密字符串
-        String message = "测试abcd1234！@#¥";
-        for (int i = 0; i <= 10; i++) {
-            message += message;
-        }
-
-//        //生成公钥和私钥
-//        Map<Integer, String> keyMap = genKeyPair();
-//        System.out.println("公钥:" + keyMap.get(0));
-//        System.out.println("私钥:" + keyMap.get(1));
-//        String messageEn = enRSA(message, keyMap.get(0));
-//        System.out.println("密文:" + messageEn);
-//        String messageDe = deRSA(messageEn, keyMap.get(1));
-//        System.out.println("明文:" + message);
-//        System.out.println("明文:" + messageDe);
-
-
-        System.out.println("明文:" + message);
-        String m = enAES(message, md5("admin".toCharArray(), true));
-        System.out.println("密文:" + m);
-        System.out.println("明文:" + deAES(m, md5("admin".toCharArray(), true)));
-        //System.out.println("md5:" + md5("admin".toCharArray()));
-    }
 }

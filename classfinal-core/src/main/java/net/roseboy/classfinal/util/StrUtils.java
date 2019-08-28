@@ -39,6 +39,16 @@ public class StrUtils {
     }
 
     /**
+     * 判断字符串是否为空
+     *
+     * @param str 字符串
+     * @return 是否是空的
+     */
+    public static boolean isEmpty(char[] str) {
+        return str == null || str.length == 0;
+    }
+
+    /**
      * 判断字符串是否不为空
      *
      * @param str 字符串

@@ -2,6 +2,7 @@ package net.roseboy.classfinal;
 
 
 import net.roseboy.classfinal.util.CmdLineOption;
+import net.roseboy.classfinal.util.Log;
 import net.roseboy.classfinal.util.StrUtils;
 
 import java.util.List;
@@ -48,24 +49,25 @@ public class Main {
             //密码
             String password = cmd.getOptionValue("pwd");
 
+
             //没有参数手动输入
             if (args == null || args.length == 0) {
                 while (StrUtils.isEmpty(path)) {
-                    System.out.print("请输入需要加密的jar/war路径:");
+                    Log.print("请输入需要加密的jar/war路径:");
                     path = scanner.nextLine();
                 }
 
-                System.out.print("请输入jar/war包lib下要加密jar文件名(多个用\",\"分割):");
+                Log.print("请输入jar/war包lib下要加密jar文件名(多个用\",\"分割):");
                 libjars = scanner.nextLine();
 
-                System.out.print("请输入需要加密的包名(可为空,多个用\",\"分割):");
+                Log.print("请输入需要加密的包名(可为空,多个用\",\"分割):");
                 packages = scanner.nextLine();
 
-                System.out.print("请输入需要排除的类名(可为空,多个用\",\"分割):");
+                Log.print("请输入需要排除的类名(可为空,多个用\",\"分割):");
                 excludeClass = scanner.nextLine();
 
                 while (StrUtils.isEmpty(password)) {
-                    System.out.print("请输入加密密码:");
+                    Log.print("请输入加密密码:");
                     password = scanner.nextLine();
                 }
             }
@@ -81,29 +83,29 @@ public class Main {
                 packages = "com.yiyon,net.roseboy,yiyon";//包名过滤
                 excludeClass = "org.spring";//排除的类
                 password = "123456";
-                //Const.DEBUG = true;
+                Const.DEBUG = true;
             }
 
 
-            System.out.println();
-            System.out.println("加密信息如下:");
-            System.out.println("-------------------------");
-            System.out.println("jar/war路径:    " + path);
-            System.out.println("lib下的jar:      " + libjars);
-            System.out.println("包名:           " + packages);
-            System.out.println("排除的类名:      " + excludeClass);
-            System.out.println("密码:           " + password);
-            System.out.println("-------------------------");
-            System.out.println();
+            Log.println();
+            Log.println("加密信息如下:");
+            Log.println("-------------------------");
+            Log.println("jar/war路径:    " + path);
+            Log.println("lib下的jar:      " + libjars);
+            Log.println("包名:           " + packages);
+            Log.println("排除的类名:      " + excludeClass);
+            Log.println("密码:           " + password);
+            Log.println("-------------------------");
+            Log.println();
 
             String yes;
             if (cmd.hasOption("Y")) {
                 yes = "Y";
             } else {
-                System.out.println("请牢记密码，密码忘记将无法启动项目。确定执行吗？(Y/n)");
+                Log.println("请牢记密码，密码忘记将无法启动项目。确定执行吗？(Y/n)");
                 yes = scanner.nextLine();
                 while (!"n".equals(yes) && !"Y".equals(yes)) {
-                    System.out.println("Yes or No ？(Y/n)");
+                    Log.println("Yes or No ？[Y/n]");
                     yes = scanner.nextLine();
                 }
             }
@@ -115,17 +117,17 @@ public class Main {
                 includeJarList.add("-");
 
                 //加密过程
-                System.out.println("处理中...");
+                Log.println("处理中...");
                 JarEncryptor decryptor = new JarEncryptor(path, password.toCharArray(), packageList, includeJarList, excludeClassList);
                 String result = decryptor.doEncryptJar();
-                System.out.println("加密完成，请牢记密码！");
-                System.out.println(result);
+                Log.println("加密完成，请牢记密码！");
+                Log.println("==>" + result);
             } else {
-                System.out.println("已取消！");
+                Log.println("已取消！");
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("ERROR: " + e.getMessage());
+            //e.printStackTrace();
+            Log.println("ERROR: " + e.getMessage());
         } finally {
             scanner.close();
         }

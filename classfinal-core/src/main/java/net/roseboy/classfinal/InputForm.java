@@ -14,9 +14,9 @@ public class InputForm {
     //密码显示字符
     private static final char passChar = '*';
     //窗口
-    private final JDialog frame = new JDialog();
+    private JDialog frame;
     //文本域
-    private JTextArea text = new JTextArea();
+    private JTextArea text;
     //已输入字符长度
     private int keyIndex = 0;
     //已输入的字符，最长100
@@ -56,21 +56,29 @@ public class InputForm {
     /**
      * 显示窗口
      */
-    public void showForm() {
-        frame.setTitle("项目启动密码 - ClassFinal");
-        frame.setSize(560, 320);
-        frame.setResizable(false);
-        frame.setLocationRelativeTo(null);
-        frame.setAlwaysOnTop(true);
-        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        text.setFont(new Font(null, 0, 18));
-        text.setBackground(new Color(0, 0, 0));
-        text.setForeground(new Color(0, 255, 0));
-        text.setText(tips);
-        text.addKeyListener(getKeyAdapter());
-        text.enableInputMethods(false);
-        frame.add(text);
-        frame.setVisible(true);
+    public boolean showForm() {
+        try {
+            frame = new JDialog();
+            frame.setTitle("项目启动密码 - ClassFinal");
+            frame.setSize(560, 320);
+            frame.setResizable(false);
+            frame.setLocationRelativeTo(null);
+            frame.setAlwaysOnTop(true);
+            frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            text = new JTextArea();
+            text.setFont(new Font(null, 0, 18));
+            text.setBackground(new Color(0, 0, 0));
+            text.setForeground(new Color(0, 255, 0));
+            text.setText(tips);
+            text.addKeyListener(getKeyAdapter());
+            text.enableInputMethods(false);
+            frame.add(text);
+            frame.setVisible(true);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
