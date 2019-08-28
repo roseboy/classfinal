@@ -24,7 +24,7 @@ JDK 1.8 +
 ## 使用说明
 
 ### 下载
-[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.1.3/classfinal-fatjar-1.1.3.jar)
+[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.1.4/classfinal-fatjar-1.1.4.jar)
 
 ### 加密
 
@@ -51,7 +51,7 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
 
 ### maven插件方式
 
-在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.3。
+在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.4。
 ```xml
 <plugin>
     <groupId>net.roseboy</groupId>
@@ -96,6 +96,7 @@ java -javaagent:yourpaoject-encrypted.jar='-pwd 0000000' -jar yourpaoject-encryp
 ```sh
 java -javaagent:yourpaoject-encrypted.jar -jar yourpaoject-encrypted.jar
 ```
+使用nohup命令启动时，如果系统支持gui，会弹出输入密码的界面，如果是纯命令行下，不支持gui，则需要在同级目录下的classfinal.txt或yourpaoject-encrypted.classfinal.txt中写入密码，项目读取到密码后会清空此文件。
 
 
 ### tomcat下运行加密后的war
@@ -126,6 +127,7 @@ set JAVA_OPTS="-javaagent:classfinal-fatjar.jar='-pwd 000000'"
 
 
 ## 版本说明
+* v1.1.4 纯命令行下运行jar时，从配置文件中读取密码，读取后清空文件
 * v1.1.3 加入输入密码的弹框
 * v1.1.2 修复windows下加密后不能启动的问题
 * v1.1.1 启动jar时在控制台输入密码，无需将密码放在参数中

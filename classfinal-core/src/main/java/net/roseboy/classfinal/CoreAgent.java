@@ -68,7 +68,7 @@ public class CoreAgent {
     /**
      * 从文件读取密码
      *
-     * @return
+     * @return 密码
      */
     public static char[] readPasswordFromFile(CmdLineOption options) {
         String path = ClassUtils.getRootPath();
@@ -82,13 +82,12 @@ public class CoreAgent {
         if (!config.exists()) {
             config = new File(path, "classfinal.txt");
         }
-        if (!config.exists()) {
-            Log.println("\nCould not get the password.");
-            Log.println("You can write the password(-pwd 123456 -del) into the 'classfinal.txt' or '" + configName + "'.");
-            return null;
+
+        String args = null;
+        if (config.exists()) {
+            args = IoUtils.readTxtFile(config);
         }
 
-        String args = IoUtils.readTxtFile(config);
         if (StrUtils.isEmpty(args)) {
             Log.println("\nCould not get the password.");
             Log.println("You can write the password(-pwd 123456 -del true) into the 'classfinal.txt' or '" + configName + "'.");
