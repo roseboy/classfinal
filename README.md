@@ -134,5 +134,8 @@ set JAVA_OPTS="-javaagent:classfinal-fatjar.jar='-pwd 000000'"
 * v1.1.0 加密jar包时将解密代码加入加密后的jar包，无需使用多余的jar文件
 * v1.0.0 第一个正式版发布
 
+## QQ交流
+
+
 ## 协议声明
 [Apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)
