@@ -2,6 +2,7 @@ package net.roseboy.classfinal;
 
 import net.roseboy.classfinal.util.StrUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.instrument.ClassFileTransformer;
 import java.net.URISyntaxException;
 import java.security.ProtectionDomain;
@@ -58,16 +59,12 @@ public class AgentTransformer implements ClassFileTransformer {
      * @return 路径
      */
     private String projectPath(ProtectionDomain protectionDomain) {
-        String path = null;
+        String path = protectionDomain.getCodeSource().getLocation().getPath();
         try {
-            //汉字会编码，所以转成uri
-            path = protectionDomain.getCodeSource().getLocation().toURI().getPath();
-        } catch (URISyntaxException e) {
+            path = java.net.URLDecoder.decode(path, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+        }
 
-        }
-        if (path == null) {
-            path = protectionDomain.getCodeSource().getLocation().getPath();
-        }
         if (path.startsWith("file:")) {
             path = path.substring(5);
         }

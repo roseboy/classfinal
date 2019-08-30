@@ -40,6 +40,7 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
 -packages    加密的包名(可为空,多个用","分割)
 -libjars     jar/war包lib下要加密jar文件名(可为空,多个用","分割)
 -exclude     排除的类名(可为空,多个用","分割)
+-classpath   外部依赖的jar目录，例如/tomcat/lib(可为空,多个用","分割)
 -pwd         加密密码
 -Y           无需确认，不加此参数会提示确认以上信息
 ```

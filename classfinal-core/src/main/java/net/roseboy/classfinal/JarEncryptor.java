@@ -24,6 +24,8 @@ public class JarEncryptor {
     private List<String> includeJars = null;
     //排除的类名
     private List<String> excludeClass = null;
+    //依赖jar路径
+    private List<String> classPath = null;
     //密码
     private char[] password = null;
     //jar还是war
@@ -51,16 +53,18 @@ public class JarEncryptor {
      * @param packages     要加密的包，多个用逗号隔开
      * @param includeJars  -INF/lib下要加密的jar
      * @param excludeClass 排除的类名
+     * @param classPath    依赖jar路径
      * @param password     密码
      */
     public JarEncryptor(String jarPath, char[] password, List<String> packages,
-                        List<String> includeJars, List<String> excludeClass) {
+                        List<String> includeJars, List<String> excludeClass, List<String> classPath) {
         super();
         this.jarPath = jarPath;
         this.packages = packages;
         this.includeJars = includeJars;
         this.excludeClass = excludeClass;
         this.password = password;
+        this.classPath = classPath;
     }
 
     /**
@@ -124,12 +128,13 @@ public class JarEncryptor {
      * @return 加密后文件的路径
      */
     public String doEncryptJar(String jarPath, char[] password, List<String> packages,
-                               List<String> includeJars, List<String> excludeClass) {
+                               List<String> includeJars, List<String> excludeClass, List<String> classPath) {
         this.jarPath = jarPath;
         this.packages = packages;
         this.includeJars = includeJars;
         this.excludeClass = excludeClass;
         this.password = password;
+        this.classPath = classPath;
         return this.doEncryptJar();
     }
 
@@ -196,6 +201,9 @@ public class JarEncryptor {
             ClassPool pool = ClassPool.getDefault();
             //lib目录
             ClassUtils.loadClassPath(pool, new File[]{this.targetLibDir});
+            //外部依赖的lib
+            ClassUtils.loadClassPath(pool, this.classPath);
+
             Log.debug("ClassPath: " + this.targetLibDir);
             List<String> classPaths = new ArrayList<>();
             for (File classFile : classFiles) {

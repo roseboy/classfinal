@@ -57,6 +57,7 @@
                                     <manifestEntries>
                                         <Main-Class>net.roseboy.classfinal.Main</Main-Class>
                                         <Premain-Class>net.roseboy.classfinal.Agent</Premain-Class>
+                                        <!--<Agent-Class>net.roseboy.classfinal.Agent</Agent-Class>-->
                                     </manifestEntries>
                                 </transformer>
                             </transformers>

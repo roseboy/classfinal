@@ -5,6 +5,7 @@ import net.roseboy.classfinal.util.*;
 import java.io.Console;
 import java.io.File;
 import java.lang.instrument.Instrumentation;
+import java.util.Arrays;
 
 /**
  * 监听类加载
@@ -34,26 +35,33 @@ public class CoreAgent {
 
         // 参数没密码，从控制台获取输入
         if (StrUtils.isEmpty(pwd)) {
-            Log.debug("参数无密码，从控制台获取输入");
+            Log.debug("无法在参数中获取密码，从控制台获取");
             Console console = System.console();
             if (console != null) {
                 Log.debug("控制台输入");
                 pwd = console.readPassword("Password:");
-            } else {//不支持控制台输入，弹出gui输入
-                Log.debug("无法获取控制台，GUI界面输入");
-                InputForm input = new InputForm();
-                boolean gui = input.showForm();
-                if (gui) {
-                    Log.debug("GUI界面输入");
-                    pwd = input.nextPasswordLine();
-                    input.closeForm();
-                } else {//不支持gui，读取文件
-                    Log.debug("当前系统不支持GUI，读取密码文件");
-                    pwd = readPasswordFromFile(options);
-                }
             }
         }
 
+        //不支持控制台输入，弹出gui输入
+        if (StrUtils.isEmpty(pwd)) {
+            Log.debug("无法从控制台中获取密码，GUI输入");
+            InputForm input = new InputForm();
+            boolean gui = input.showForm();
+            if (gui) {
+                Log.debug("GUI输入");
+                pwd = input.nextPasswordLine();
+                input.closeForm();
+            }
+        }
+
+        //不支持gui，读取密码配置文件
+        if (StrUtils.isEmpty(pwd)) {
+            Log.debug("无法从GUI中获取密码，读取密码文件");
+            pwd = readPasswordFromFile(options);
+        }
+
+        //还是没有获取密码，退出
         if (StrUtils.isEmpty(pwd)) {
             Log.println("\nERROR: Startup failed, could not get the password.\n");
             System.exit(0);
@@ -90,7 +98,7 @@ public class CoreAgent {
 
         if (StrUtils.isEmpty(args)) {
             Log.println("\nCould not get the password.");
-            Log.println("You can write the password(-pwd 123456 -del true) into the 'classfinal.txt' or '" + configName + "'.");
+            Log.println("You can write the password(-pwd 123456 -del true) into the '" + path + "classfinal.txt' or '" + path + configName + "'.");
             return null;
         }
         if (!args.contains(" ")) {

@@ -39,6 +39,9 @@ public class ClassFinalPlugin extends AbstractMojo {
     //排除的类名
     @Parameter
     String excludes;
+    //外部依赖jarlib
+    @Parameter
+    String classpath;
     //调试
     @Parameter(defaultValue = "false")
     Boolean debug;
@@ -61,10 +64,11 @@ public class ClassFinalPlugin extends AbstractMojo {
         List<String> includeJarList = StrUtils.toList(libjars);
         List<String> packageList = StrUtils.toList(packages);
         List<String> excludeClassList = StrUtils.toList(excludes);
+        List<String> classPathList = StrUtils.toList(classpath);
         includeJarList.add("-");
 
         //加密过程
-        JarEncryptor encryptor = new JarEncryptor(targetJar, password.toCharArray(), packageList, includeJarList, excludeClassList);
+        JarEncryptor encryptor = new JarEncryptor(targetJar, password.toCharArray(), packageList, includeJarList, excludeClassList, classPathList);
         String result = encryptor.doEncryptJar();
         long t2 = System.currentTimeMillis();
 

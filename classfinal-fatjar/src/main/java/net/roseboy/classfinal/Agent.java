@@ -23,4 +23,19 @@ public class Agent {
         CoreAgent.premain(args, inst);
     }
 
+    /**
+     * 项目启动后动态加载代理
+     *
+     * @param args args
+     * @param inst inst
+     */
+    public static void agentmain(String args, Instrumentation inst) {
+
+    }
+
+//    public static void main(String[] args) throws IOException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
+//        VirtualMachine vm = VirtualMachine.attach("22051");//args[0]传入的是jvm的pid号
+//        vm.loadAgent("/Users/roseboy/code-space/classfinal/classfinal-fatjar/target/classfinal-fatjar-1.1.4.jar");
+//    }
+
 }

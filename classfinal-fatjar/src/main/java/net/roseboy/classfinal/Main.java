@@ -34,7 +34,9 @@ public class Main {
             cmd.addOption("exclude", true, "排除的类名(可为空,多个用\",\"分割)");
             cmd.addOption("file", true, "加密的jar/war路径");
             cmd.addOption("libjars", true, "jar/war lib下的jar(多个用\",\"分割)");
+            cmd.addOption("cpasspath", true, "依赖jar包目录(多个用\",\"分割)");
             cmd.addOption("Y", false, "无需确认");
+            cmd.addOption("debug", false, "调试模式");
             cmd.parse(args);
 
 
@@ -46,6 +48,8 @@ public class Main {
             String packages = cmd.getOptionValue("packages");
             //排除的class
             String excludeClass = cmd.getOptionValue("exclude");
+            //依赖jar包路径
+            String cpasspath = cmd.getOptionValue("cpasspath");
             //密码
             String password = cmd.getOptionValue("pwd");
 
@@ -66,6 +70,9 @@ public class Main {
                 Log.print("请输入需要排除的类名(可为空,多个用\",\"分割):");
                 excludeClass = scanner.nextLine();
 
+                Log.print("请输入依赖jar包目录(可为空,多个用\",\"分割):");
+                cpasspath = scanner.nextLine();
+
                 while (StrUtils.isEmpty(password)) {
                     Log.print("请输入加密密码:");
                     password = scanner.nextLine();
@@ -74,15 +81,19 @@ public class Main {
 
             //test数据
             if ("123123".equals(path)) {
-                //springboot jar
                 path = "/Users/roseboy/work-yiyon/易用框架/yiyon-server-liuyuan/yiyon-package-liuyuan/target/yiyon-package-liuyuan-1.0.0.jar";
-                //spring web war
-                //path = "/Users/roseboy/work-yiyon/北大口腔/erpbeidakouqiang/target/erpbeidakouqiang-1.0.0.war";
-
                 libjars = "yiyon-basedata-1.0.0.jar,jeee-admin-1.0.0.jar,aspectjweaver-1.8.13.jar,a.jar";
                 packages = "com.yiyon,net.roseboy,yiyon";//包名过滤
                 excludeClass = "org.spring";//排除的类
                 password = "123456";
+                cpasspath = "/Users/roseboy/code-space/apache-tomcat-8.5.32/lib";
+                Const.DEBUG = true;
+            } else if ("123".equals(path)) {
+                path = "/Users/roseboy/code-space/pig_project/target/pig_project_maven.war";
+                packages = "net.roseboy";//包名过滤
+                excludeClass = "org.spring";//排除的类
+                password = "123456";
+                cpasspath = "/Users/roseboy/code-space/apache-tomcat-8.5.32/lib";
                 Const.DEBUG = true;
             }
 
@@ -94,6 +105,7 @@ public class Main {
             Log.println("lib下的jar:      " + libjars);
             Log.println("包名:           " + packages);
             Log.println("排除的类名:      " + excludeClass);
+            Log.println("ClassPath:      " + cpasspath);
             Log.println("密码:           " + password);
             Log.println("-------------------------");
             Log.println();
@@ -114,11 +126,12 @@ public class Main {
                 List<String> includeJarList = StrUtils.toList(libjars);
                 List<String> packageList = StrUtils.toList(packages);
                 List<String> excludeClassList = StrUtils.toList(excludeClass);
+                List<String> classPathList = StrUtils.toList(cpasspath);
                 includeJarList.add("-");
 
                 //加密过程
                 Log.println("处理中...");
-                JarEncryptor decryptor = new JarEncryptor(path, password.toCharArray(), packageList, includeJarList, excludeClassList);
+                JarEncryptor decryptor = new JarEncryptor(path, password.toCharArray(), packageList, includeJarList, excludeClassList, classPathList);
                 String result = decryptor.doEncryptJar();
                 Log.println("加密完成，请牢记密码！");
                 Log.println("==>" + result);

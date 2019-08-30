@@ -115,12 +115,42 @@ public class ClassUtils {
      */
     public static void loadClassPath(ClassPool pool, File[] files) throws NotFoundException {
         for (File dir : files) {
-            List<File> jars = new ArrayList<>();
+            if (!dir.exists()) {
+                continue;
+            }
+            
             if (dir.isDirectory()) {
+                List<File> jars = new ArrayList<>();
                 IoUtils.listFile(jars, dir, ".jar");
                 for (File jar : jars) {
                     pool.insertClassPath(jar.getAbsolutePath());
                 }
+            }
+        }
+    }
+
+    /**
+     * 加载jar包路径
+     *
+     * @param pool  javassist的ClassPool
+     * @param paths lib路径，
+     * @throws NotFoundException NotFoundException
+     */
+    public static void loadClassPath(ClassPool pool, List<String> paths) throws NotFoundException {
+        for (String path : paths) {
+            File dir = new File(path);
+            if (!dir.exists()) {
+                continue;
+            }
+
+            if (dir.isDirectory()) {
+                List<File> jars = new ArrayList<>();
+                IoUtils.listFile(jars, dir, ".jar");
+                for (File jar : jars) {
+                    pool.insertClassPath(jar.getAbsolutePath());
+                }
+            } else if (dir.getAbsolutePath().endsWith(".jar")) {
+                pool.insertClassPath(dir.getAbsolutePath());
             }
         }
     }
