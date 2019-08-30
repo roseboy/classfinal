@@ -29,7 +29,7 @@ public class Const {
         System.out.println();
         System.out.println("=========================================================");
         System.out.println("=                                                       =");
-        System.out.println("=      Java Class Encryption Tool v1.1.4   by Mr.K      =");
+        System.out.println("=      Java Class Encryption Tool v1.1.5   by Mr.K      =");
         System.out.println("=                                                       =");
         System.out.println("=========================================================");
         System.out.println();

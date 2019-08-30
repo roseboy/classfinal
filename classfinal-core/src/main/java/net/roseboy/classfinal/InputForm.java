@@ -55,6 +55,8 @@ public class InputForm {
 
     /**
      * 显示窗口
+     *
+     * @return 显示是否成功
      */
     public boolean showForm() {
         try {

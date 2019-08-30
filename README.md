@@ -24,7 +24,7 @@ JDK 1.8 +
 ## 使用说明
 
 ### 下载
-[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.1.4/classfinal-fatjar-1.1.4.jar)
+[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.1.5/classfinal-fatjar-1.1.5.jar)
 
 ### 加密
 
@@ -41,7 +41,7 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
 -libjars     jar/war包lib下要加密jar文件名(可为空,多个用","分割)
 -exclude     排除的类名(可为空,多个用","分割)
 -classpath   外部依赖的jar目录，例如/tomcat/lib(可为空,多个用","分割)
--pwd         加密密码
+-pwd         加密密码，如果时#号，则使用无密码模式加密
 -Y           无需确认，不加此参数会提示确认以上信息
 ```
 
@@ -52,7 +52,7 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
 
 ### maven插件方式
 
-在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.4。
+在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.5。
 ```xml
 <plugin>
     <groupId>net.roseboy</groupId>
@@ -113,7 +113,9 @@ export CATALINA_OPTS;
 //win下catalina.bat
 set JAVA_OPTS="-javaagent:classfinal-fatjar.jar='-pwd 000000'"
 
-//参数说明 -pwd   加密项目的密码  
+//参数说明 
+// -pwd      加密项目的密码  
+// -nopwd    无密码加密时启动加上此参数，跳过输密码过程
 
 ```
 
@@ -128,6 +130,7 @@ set JAVA_OPTS="-javaagent:classfinal-fatjar.jar='-pwd 000000'"
 
 
 ## 版本说明
+* v1.1.5 增加无密码加密方式，启动无需输密码，但是并不安全
 * v1.1.4 纯命令行下运行jar时，从配置文件中读取密码，读取后清空文件
 * v1.1.3 加入输入密码的弹框
 * v1.1.2 修复windows下加密后不能启动的问题

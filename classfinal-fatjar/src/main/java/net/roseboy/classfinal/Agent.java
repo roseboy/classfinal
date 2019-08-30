@@ -35,7 +35,7 @@ public class Agent {
 
 //    public static void main(String[] args) throws IOException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
 //        VirtualMachine vm = VirtualMachine.attach("22051");//args[0]传入的是jvm的pid号
-//        vm.loadAgent("/Users/roseboy/code-space/classfinal/classfinal-fatjar/target/classfinal-fatjar-1.1.4.jar");
+//        vm.loadAgent("/Users/roseboy/code-space/classfinal/classfinal-fatjar/target/classfinal-fatjar-1.1.5.jar");
 //    }
 
 }

@@ -100,6 +100,7 @@ public class CmdLineOption {
      * Retrieve the first argument, if any, of this option.
      *
      * @param opt the name of the option
+     * @param dv  default value
      * @return Value of the argument if option is set, and has an argument,
      * otherwise null.
      */

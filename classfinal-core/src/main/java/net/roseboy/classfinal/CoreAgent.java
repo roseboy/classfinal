@@ -100,6 +100,7 @@ public class CoreAgent {
     /**
      * 读取隐藏的密码
      *
+     * @param path 项目路径
      * @return 是否
      */
     public static char[] readJarPassword(String path) {
@@ -129,6 +130,7 @@ public class CoreAgent {
     /**
      * 从文件读取密码
      *
+     * @param options 参数开关
      * @return 密码
      */
     public static char[] readPasswordFromFile(CmdLineOption options) {

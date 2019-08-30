@@ -128,6 +128,7 @@ public class JarEncryptor {
      * @param includeJars  -INF/lib下要加密的jar
      * @param excludeClass 排除的类名
      * @param password     密码
+     * @param classPath    外部依赖jar
      * @return 加密后文件的路径
      */
     public String doEncryptJar(String jarPath, char[] password, List<String> packages,
