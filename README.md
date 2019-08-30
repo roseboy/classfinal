@@ -136,6 +136,7 @@ set JAVA_OPTS="-javaagent:classfinal-fatjar.jar='-pwd 000000'"
 
 ## QQ交流
 
+![QQ交流](https://gitee.com/roseboy/classfinal/raw/master/qqgroup.png "QQ交流")
 
 ## 协议声明
 [Apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)
