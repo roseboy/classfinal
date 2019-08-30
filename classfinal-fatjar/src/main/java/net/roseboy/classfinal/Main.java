@@ -80,7 +80,7 @@ public class Main {
             }
 
             //test数据
-            if ("123123".equals(path)) {
+            if ("1".equals(path)) {
                 path = "/Users/roseboy/work-yiyon/易用框架/yiyon-server-liuyuan/yiyon-package-liuyuan/target/yiyon-package-liuyuan-1.0.0.jar";
                 libjars = "yiyon-basedata-1.0.0.jar,jeee-admin-1.0.0.jar,aspectjweaver-1.8.13.jar,a.jar";
                 packages = "com.yiyon,net.roseboy,yiyon";//包名过滤
@@ -88,11 +88,11 @@ public class Main {
                 password = "123456";
                 cpasspath = "/Users/roseboy/code-space/apache-tomcat-8.5.32/lib";
                 Const.DEBUG = true;
-            } else if ("123".equals(path)) {
+            } else if ("2".equals(path)) {
                 path = "/Users/roseboy/code-space/pig_project/target/pig_project_maven.war";
                 packages = "net.roseboy";//包名过滤
                 excludeClass = "org.spring";//排除的类
-                password = "123456";
+                password = "#";
                 cpasspath = "/Users/roseboy/code-space/apache-tomcat-8.5.32/lib";
                 Const.DEBUG = true;
             }

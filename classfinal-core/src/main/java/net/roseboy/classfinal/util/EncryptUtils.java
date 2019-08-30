@@ -8,9 +8,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 简单加密解密
@@ -388,5 +386,28 @@ public class EncryptUtils {
 
         }
         return original;
+    }
+
+    /**
+     * 随机字串
+     *
+     * @param lenght 长度
+     * @return 字符数组
+     */
+    public static char[] randChar(int lenght) {
+        char[] result = new char[lenght];
+        Character[] chars = new Character[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+                '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '=', '_', '+', '.'};
+
+        List<Character> list = Arrays.asList(chars);
+        Collections.shuffle(list);
+        for (int i = 0; i < lenght; i++) {
+            result[i] = list.get(i);
+        }
+        return result;
     }
 }

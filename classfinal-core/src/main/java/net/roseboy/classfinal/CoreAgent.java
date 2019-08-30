@@ -5,7 +5,6 @@ import net.roseboy.classfinal.util.*;
 import java.io.Console;
 import java.io.File;
 import java.lang.instrument.Instrumentation;
-import java.util.Arrays;
 
 /**
  * 监听类加载
@@ -25,12 +24,27 @@ public class CoreAgent {
         options.addOption("pwd", true, "密码");
         options.addOption("debug", false, "调试模式");
         options.addOption("del", true, "读取密码后删除密码");
+        options.addOption("nopwd", false, "无密码启动");
 
-        char[] pwd = null;
+        char[] pwd;
+
+        //读取jar隐藏的密码，无密码启动模式(jar)
+        pwd = readJarPassword();
+
         if (args != null) {
             options.parse(args.split(" "));
-            pwd = options.getOptionValue("pwd", "").toCharArray();
             Const.DEBUG = options.hasOption("debug");
+        }
+
+        //参数标识 无密码启动
+        if (options.hasOption("nopwd")) {
+            pwd = new char[1];
+            pwd[0] = '#';
+        }
+
+        //参数获取密码
+        if (StrUtils.isEmpty(pwd)) {
+            pwd = options.getOptionValue("pwd", "").toCharArray();
         }
 
         // 参数没密码，从控制台获取输入
@@ -71,6 +85,45 @@ public class CoreAgent {
             AgentTransformer tran = new AgentTransformer(pwd);
             inst.addTransformer(tran);
         }
+    }
+
+    /**
+     * 读取隐藏的密码
+     *
+     * @return 是否
+     */
+    public static char[] readJarPassword() {
+        String path = ClassUtils.getRootPath();
+        return readJarPassword(path);
+    }
+
+    /**
+     * 读取隐藏的密码
+     *
+     * @return 是否
+     */
+    public static char[] readJarPassword(String path) {
+        String classFile = "META-INF/" + Const.FILE_NAME + "/" + Const.FLAG_PASS;
+        File workDir = new File(path);
+        byte[] passbyte = null;
+        if (workDir.isFile()) {
+            passbyte = JarUtils.getFileFromJar(new File(path), classFile);
+        } else {//war解压的目录
+            File file = new File(workDir, classFile);
+            if (file.exists()) {
+                passbyte = IoUtils.readFileToByte(file);
+            }
+        }
+
+        if (passbyte != null) {
+            char[] pass = new char[passbyte.length];
+            for (int i = 0; i < passbyte.length; i++) {
+                pass[i] = (char) passbyte[i];
+            }
+            return EncryptUtils.md5(pass);
+        }
+        return null;
+
     }
 
     /**
@@ -117,4 +170,5 @@ public class CoreAgent {
         }
         return pwd;
     }
+
 }

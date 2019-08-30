@@ -4,7 +4,6 @@ import net.roseboy.classfinal.util.StrUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.instrument.ClassFileTransformer;
-import java.net.URISyntaxException;
 import java.security.ProtectionDomain;
 
 
@@ -42,8 +41,14 @@ public class AgentTransformer implements ClassFileTransformer {
         }
 
         className = className.replace("/", ".").replace("\\", ".");
+        char[] password = pwd;
 
-        byte[] bytes = decryptor.doDecrypt(projectPath, className, pwd);
+        //无密码启动
+        if (pwd.length == 1 && pwd[0] == '#') {
+            password = CoreAgent.readJarPassword(projectPath);
+        }
+
+        byte[] bytes = decryptor.doDecrypt(projectPath, className, password);
         //CAFEBABE,表示解密成功
         if (bytes != null && bytes[0] == -54 && bytes[1] == -2 && bytes[2] == -70 && bytes[3] == -66) {
             return bytes;

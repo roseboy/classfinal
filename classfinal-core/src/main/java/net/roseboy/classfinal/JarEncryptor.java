@@ -82,6 +82,9 @@ public class JarEncryptor {
         if (password == null || password.length == 0) {
             throw new RuntimeException("密码不能为空");
         }
+        if (password.length == 1 && password[0] == '#') {
+            Log.debug("加密模式：无密码");
+        }
         this.jarOrWar = jarPath.substring(jarPath.lastIndexOf(".") + 1);
         Log.debug("加密类型：" + jarOrWar);
         //临时work目录
@@ -176,11 +179,19 @@ public class JarEncryptor {
             metaDir.mkdirs();
         }
 
+        //无密码模式,自动生成一个密码
+        if (this.password.length == 1 && this.password[0] == '#') {
+            File configPass = new File(metaDir, Const.FLAG_PASS);
+            password = EncryptUtils.randChar(32);
+            IoUtils.writeFile(configPass, IoUtils.toBytes(password));
+            password = EncryptUtils.md5(password);
+        }
+
         //加密另存
         for (File classFile : classFiles) {
             String className = resolveClassName(classFile.getAbsolutePath(), true);
             byte[] bytes = IoUtils.readFileToByte(classFile);
-            bytes = EncryptUtils.en(bytes, IoUtils.merger(password, className.toCharArray()), 1);
+            bytes = EncryptUtils.en(bytes, IoUtils.merger(password, className.toCharArray()), Const.ENCRYPT_TYPE);
             File targetFile = new File(metaDir, className);
             IoUtils.writeFile(targetFile, bytes);
             encryptClasses.add(className);
@@ -201,10 +212,15 @@ public class JarEncryptor {
             ClassPool pool = ClassPool.getDefault();
             //lib目录
             ClassUtils.loadClassPath(pool, new File[]{this.targetLibDir});
+            Log.debug("ClassPath: " + this.targetLibDir.getAbsolutePath());
+
             //外部依赖的lib
             ClassUtils.loadClassPath(pool, this.classPath);
+            for (String classPath : this.classPath) {
+                Log.debug("ClassPath: " + classPath);
+            }
 
-            Log.debug("ClassPath: " + this.targetLibDir);
+
             List<String> classPaths = new ArrayList<>();
             for (File classFile : classFiles) {
                 //要修改的class所在的目录
@@ -301,13 +317,19 @@ public class JarEncryptor {
 
         //把javaagent信息加入到MANIFEST.MF
         File manifest = new File(this.targetDir, "META-INF/MANIFEST.MF");
-        String[] txts = IoUtils.readTxtFile(manifest).split("\r\n");
         StringBuffer newTxt = new StringBuffer();
-        for (int i = 0; i < txts.length; i++) {
-            newTxt.append(txts[i]).append("\r\n");
-            if (txts[i].startsWith("Main-Class:")) {
-                newTxt.append("Premain-Class: ").append(CoreAgent.class.getName()).append("\r\n");
+        if (manifest.exists()) {
+            String[] txts = IoUtils.readTxtFile(manifest).split("\r\n");
+            for (int i = 0; i < txts.length; i++) {
+                newTxt.append(txts[i]).append("\r\n");
+                if (txts[i].startsWith("Main-Class:")) {
+                    newTxt.append("Premain-Class: ").append(CoreAgent.class.getName()).append("\r\n");
+                }
             }
+        } else {
+            manifest.mkdirs();
+            manifest.delete();
+            newTxt.append("Premain-Class: ").append(CoreAgent.class.getName()).append("\r\n");
         }
         newTxt.append("\r\n\r\n");
         IoUtils.writeTxtFile(manifest, newTxt.toString());

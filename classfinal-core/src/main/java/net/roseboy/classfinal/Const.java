@@ -16,6 +16,12 @@ public class Const {
     //lib下的jar解压的目录名后缀
     public static final String LIB_JAR_DIR = "__temp__";
 
+    //默认加密方式
+    public static final int ENCRYPT_TYPE = 1;
+
+    //密码标记
+    public static final String FLAG_PASS = "org.springframework.config.Pass";
+
     //调试模式
     public static boolean DEBUG = false;
 

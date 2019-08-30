@@ -77,7 +77,9 @@ public class IoUtils {
      * @return 字节数组
      */
     public static byte[] toBytes(char[] chars) {
-        CharBuffer charBuffer = CharBuffer.wrap(chars);
+        char[] chars0 = new char[chars.length];
+        System.arraycopy(chars, 0, chars0, 0, chars.length);
+        CharBuffer charBuffer = CharBuffer.wrap(chars0);
         ByteBuffer byteBuffer = Charset.forName("UTF-8").encode(charBuffer);
         byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
                 byteBuffer.position(), byteBuffer.limit());
