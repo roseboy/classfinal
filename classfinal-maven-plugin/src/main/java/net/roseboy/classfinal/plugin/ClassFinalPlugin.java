@@ -30,6 +30,9 @@ public class ClassFinalPlugin extends AbstractMojo {
     //密码
     @Parameter(required = true)
     private String password;
+    //机器码
+    @Parameter
+    private String code;
     //加密的内部-lib/jar名称
     @Parameter
     String libjars;
@@ -59,7 +62,8 @@ public class ClassFinalPlugin extends AbstractMojo {
 
         long t1 = System.currentTimeMillis();
 
-        String targetJar = build.getDirectory() + File.separator + build.getFinalName() + "." + project.getPackaging();
+        String targetJar = build.getDirectory() + File.separator + build.getFinalName()
+                + "." + project.getPackaging();
         logger.info("Encrypting " + project.getPackaging() + " [" + targetJar + "]");
         List<String> includeJarList = StrUtils.toList(libjars);
         List<String> packageList = StrUtils.toList(packages);
@@ -68,7 +72,9 @@ public class ClassFinalPlugin extends AbstractMojo {
         includeJarList.add("-");
 
         //加密过程
-        JarEncryptor encryptor = new JarEncryptor(targetJar, password.toCharArray(), packageList, includeJarList, excludeClassList, classPathList);
+        JarEncryptor encryptor = new JarEncryptor(targetJar, password.trim().toCharArray(),
+                StrUtils.isEmpty(code) ? null : code.trim().toCharArray(),
+                packageList, includeJarList, excludeClassList, classPathList);
         String result = encryptor.doEncryptJar();
         long t2 = System.currentTimeMillis();
 

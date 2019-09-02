@@ -1,10 +1,6 @@
 package net.roseboy.classfinal.util;
 
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.List;
 import java.util.zip.CRC32;
 
@@ -68,24 +64,6 @@ public class IoUtils {
         } finally {
             close(output, input);
         }
-    }
-
-    /**
-     * 字符数组转成字节数组
-     *
-     * @param chars 字符数组
-     * @return 字节数组
-     */
-    public static byte[] toBytes(char[] chars) {
-        char[] chars0 = new char[chars.length];
-        System.arraycopy(chars, 0, chars0, 0, chars.length);
-        CharBuffer charBuffer = CharBuffer.wrap(chars0);
-        ByteBuffer byteBuffer = Charset.forName("UTF-8").encode(charBuffer);
-        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
-                byteBuffer.position(), byteBuffer.limit());
-        Arrays.fill(charBuffer.array(), '\u0000'); // clear sensitive data
-        Arrays.fill(byteBuffer.array(), (byte) 0); // clear sensitive data
-        return bytes;
     }
 
     /**
@@ -264,28 +242,7 @@ public class IoUtils {
         int lastLength = 0;
         for (byte[] b : bts) {
             System.arraycopy(b, 0, bt, lastLength, b.length);
-            lastLength = b.length;
-        }
-        return bt;
-    }
-
-    /**
-     * 合并byte[]
-     *
-     * @param bts 字节数组
-     * @return 合并后的字节
-     */
-    public static char[] merger(char[]... bts) {
-        int lenght = 0;
-        for (char[] b : bts) {
-            lenght += b.length;
-        }
-
-        char[] bt = new char[lenght];
-        int lastLength = 0;
-        for (char[] b : bts) {
-            System.arraycopy(b, 0, bt, lastLength, b.length);
-            lastLength = b.length;
+            lastLength += b.length;
         }
         return bt;
     }

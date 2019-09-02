@@ -118,7 +118,7 @@ public class ClassUtils {
             if (!dir.exists()) {
                 continue;
             }
-            
+
             if (dir.isDirectory()) {
                 List<File> jars = new ArrayList<>();
                 IoUtils.listFile(jars, dir, ".jar");
@@ -164,7 +164,7 @@ public class ClassUtils {
      */
     public static boolean isPackage(List<String> encryptPackage, String className) {
         if (encryptPackage == null || encryptPackage.size() == 0) {
-            return false;
+            return true;
         }
 
         for (String pkg : encryptPackage) {

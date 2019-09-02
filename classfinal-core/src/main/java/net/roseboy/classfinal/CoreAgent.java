@@ -6,6 +6,7 @@ import java.io.Console;
 import java.io.File;
 import java.lang.instrument.Instrumentation;
 
+
 /**
  * 监听类加载
  *
@@ -29,7 +30,7 @@ public class CoreAgent {
         char[] pwd;
 
         //读取jar隐藏的密码，无密码启动模式(jar)
-        pwd = readJarPassword();
+        pwd = JarDecryptor.readPassFromJar(new File(ClassUtils.getRootPath()));
 
         if (args != null) {
             options.parse(args.split(" "));
@@ -88,46 +89,6 @@ public class CoreAgent {
     }
 
     /**
-     * 读取隐藏的密码
-     *
-     * @return 是否
-     */
-    public static char[] readJarPassword() {
-        String path = ClassUtils.getRootPath();
-        return readJarPassword(path);
-    }
-
-    /**
-     * 读取隐藏的密码
-     *
-     * @param path 项目路径
-     * @return 是否
-     */
-    public static char[] readJarPassword(String path) {
-        String classFile = "META-INF/" + Const.FILE_NAME + "/" + Const.FLAG_PASS;
-        File workDir = new File(path);
-        byte[] passbyte = null;
-        if (workDir.isFile()) {
-            passbyte = JarUtils.getFileFromJar(new File(path), classFile);
-        } else {//war解压的目录
-            File file = new File(workDir, classFile);
-            if (file.exists()) {
-                passbyte = IoUtils.readFileToByte(file);
-            }
-        }
-
-        if (passbyte != null) {
-            char[] pass = new char[passbyte.length];
-            for (int i = 0; i < passbyte.length; i++) {
-                pass[i] = (char) passbyte[i];
-            }
-            return EncryptUtils.md5(pass);
-        }
-        return null;
-
-    }
-
-    /**
      * 从文件读取密码
      *
      * @param options 参数开关
@@ -157,7 +118,7 @@ public class CoreAgent {
             return null;
         }
         if (!args.contains(" ")) {
-            return args.toCharArray();
+            return args.trim().toCharArray();
         }
 
         options.parse(args.trim().split(" "));
@@ -172,5 +133,28 @@ public class CoreAgent {
         }
         return pwd;
     }
+
+    /**
+     * 项目启动后动态加载代理
+     *
+     * @param args args
+     * @param inst inst
+     */
+    public static void agentmain(String args, Instrumentation inst) {
+        premain(args, inst);
+    }
+
+    /**
+     * Main
+     *
+     * @param args args
+     * @throws Exception Exception
+     */
+//    public static void main(String[] args) throws Exception {
+//        String name = ManagementFactory.getRuntimeMXBean().getName();
+//        String pid = name.split("@")[0];
+//        VirtualMachine vm = VirtualMachine.attach(pid);
+//        vm.loadAgent(ClassUtils.getRootPath());
+//    }
 
 }

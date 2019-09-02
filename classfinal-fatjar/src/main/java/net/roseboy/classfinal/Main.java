@@ -1,10 +1,9 @@
 package net.roseboy.classfinal;
 
 
-import net.roseboy.classfinal.util.CmdLineOption;
-import net.roseboy.classfinal.util.Log;
-import net.roseboy.classfinal.util.StrUtils;
+import net.roseboy.classfinal.util.*;
 
+import java.io.File;
 import java.util.List;
 import java.util.Scanner;
 
@@ -31,27 +30,36 @@ public class Main {
             CmdLineOption cmd = new CmdLineOption();
             cmd.addOption("packages", true, "加密的包名(可为空,多个用\",\"分割)");
             cmd.addOption("pwd", true, "加密密码");
+            cmd.addOption("code", true, "机器码");
             cmd.addOption("exclude", true, "排除的类名(可为空,多个用\",\"分割)");
             cmd.addOption("file", true, "加密的jar/war路径");
             cmd.addOption("libjars", true, "jar/war lib下的jar(多个用\",\"分割)");
             cmd.addOption("cpasspath", true, "依赖jar包目录(多个用\",\"分割)");
             cmd.addOption("Y", false, "无需确认");
             cmd.addOption("debug", false, "调试模式");
+            cmd.addOption("C", false, "生成机器码");
             cmd.parse(args);
+
+            if (cmd.hasOption("C")) {
+                makeCode();
+                return;
+            }
 
 
             //需要加密的class路径
-            String path = cmd.getOptionValue("file");
+            String path = cmd.getOptionValue("file", "");
             //lib下的jar
-            String libjars = cmd.getOptionValue("libjars");
+            String libjars = cmd.getOptionValue("libjars", "");
             //包名
-            String packages = cmd.getOptionValue("packages");
+            String packages = cmd.getOptionValue("packages", "");
             //排除的class
-            String excludeClass = cmd.getOptionValue("exclude");
+            String excludeClass = cmd.getOptionValue("exclude", "");
             //依赖jar包路径
-            String cpasspath = cmd.getOptionValue("cpasspath");
+            String cpasspath = cmd.getOptionValue("cpasspath", "");
             //密码
-            String password = cmd.getOptionValue("pwd");
+            String password = cmd.getOptionValue("pwd", "");
+            //机器码
+            String code = cmd.getOptionValue("code", "");
 
 
             //没有参数手动输入
@@ -72,6 +80,10 @@ public class Main {
 
                 Log.print("请输入依赖jar包目录(可为空,多个用\",\"分割):");
                 cpasspath = scanner.nextLine();
+
+
+                Log.print("请输入机器码(可为空):");
+                code = scanner.nextLine();
 
                 while (StrUtils.isEmpty(password)) {
                     Log.print("请输入加密密码:");
@@ -107,6 +119,7 @@ public class Main {
             Log.println("排除的类名:      " + excludeClass);
             Log.println("ClassPath:      " + cpasspath);
             Log.println("密码:           " + password);
+            Log.println("机器码:           " + code);
             Log.println("-------------------------");
             Log.println();
 
@@ -131,7 +144,9 @@ public class Main {
 
                 //加密过程
                 Log.println("处理中...");
-                JarEncryptor decryptor = new JarEncryptor(path, password.toCharArray(), packageList, includeJarList, excludeClassList, classPathList);
+                JarEncryptor decryptor = new JarEncryptor(path, password.trim().toCharArray(),
+                        StrUtils.isEmpty(code) ? null : code.trim().toCharArray(),
+                        packageList, includeJarList, excludeClassList, classPathList);
                 String result = decryptor.doEncryptJar();
                 Log.println("加密完成，请牢记密码！");
                 Log.println("==>" + result);
@@ -144,5 +159,20 @@ public class Main {
         } finally {
             scanner.close();
         }
+    }
+
+    /**
+     * 生成机器码
+     */
+    public static void makeCode() {
+        String path = ClassUtils.getRootPath();
+        path = path.substring(0, path.lastIndexOf("/") + 1);
+
+        String code = new String(SysUtils.makeMarchinCode());
+        File file = new File(path, "classfinal-code.txt");
+        IoUtils.writeTxtFile(file, code);
+        Log.println("Server code is: " + code);
+        Log.println("==>" + file.getAbsolutePath());
+        Log.println();
     }
 }

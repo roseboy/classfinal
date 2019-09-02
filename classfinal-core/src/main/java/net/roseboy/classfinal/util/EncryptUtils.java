@@ -31,7 +31,7 @@ public class EncryptUtils {
      */
     public static byte[] en(byte[] msg, char[] key, int type) {
         if (type == 1) {
-            return enAES(msg, md5(IoUtils.merger(key, SALT), true));
+            return enAES(msg, md5(StrUtils.merger(key, SALT), true));
         }
         return enSimple(msg, key);
     }
@@ -46,7 +46,7 @@ public class EncryptUtils {
      */
     public static byte[] de(byte[] msg, char[] key, int type) {
         if (type == 1) {
-            return deAES(msg, md5(IoUtils.merger(key, SALT), true));
+            return deAES(msg, md5(StrUtils.merger(key, SALT), true));
         }
         return deSimple(msg, key);
     }
@@ -61,7 +61,7 @@ public class EncryptUtils {
         byte[] b = null;
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] buffer = IoUtils.toBytes(str);
+            byte[] buffer = StrUtils.toBytes(str);
             md.update(buffer);
             b = md.digest();
         } catch (NoSuchAlgorithmException e) {
@@ -100,7 +100,7 @@ public class EncryptUtils {
         }
         char[] result = new char[0];
         for (int i = begin; i < end; i++) {
-            result = IoUtils.merger(result, Integer.toHexString((0x000000FF & s[i]) | 0xFFFFFF00).substring(6).toCharArray());
+            result = StrUtils.merger(result, Integer.toHexString((0x000000FF & s[i]) | 0xFFFFFF00).substring(6).toCharArray());
         }
         return result;
     }
@@ -116,7 +116,7 @@ public class EncryptUtils {
      * @return 加密后的字节
      */
     public static byte[] enSimple(byte[] msg, int start, int end, char[] key) {
-        byte[] keys = IoUtils.merger(md5byte(IoUtils.merger(key, SALT)), md5byte(IoUtils.merger(SALT, key)));
+        byte[] keys = IoUtils.merger(md5byte(StrUtils.merger(key, SALT)), md5byte(StrUtils.merger(SALT, key)));
         for (int i = start; i <= end; i++) {
             msg[i] = (byte) (msg[i] ^ keys[i % keys.length]);
         }
@@ -133,7 +133,7 @@ public class EncryptUtils {
      * @return 解密后的字节
      */
     public static byte[] deSimple(byte[] msg, int start, int end, char[] key) {
-        byte[] keys = IoUtils.merger(md5byte(IoUtils.merger(key, SALT)), md5byte(IoUtils.merger(SALT, key)));
+        byte[] keys = IoUtils.merger(md5byte(StrUtils.merger(key, SALT)), md5byte(StrUtils.merger(SALT, key)));
         for (int i = start; i <= end; i++) {
             msg[i] = (byte) (msg[i] ^ keys[i % keys.length]);
         }
@@ -173,7 +173,6 @@ public class EncryptUtils {
         try {
             byte[] in = str.getBytes("UTF-8");
             byte[] out = enRSA(in, publicKey);
-            //String outStr = Base64.encodeBase64String(out);
             String outStr = Base64.getEncoder().encodeToString(out);
             return outStr;
         } catch (Exception e) {
@@ -192,7 +191,6 @@ public class EncryptUtils {
     public static byte[] enRSA(byte[] msg, String publicKey) {
         try {
             //base64编码的公钥
-            //byte[] decoded = Base64.decodeBase64(publicKey);
             byte[] decoded = Base64.getDecoder().decode(publicKey.getBytes("UTF-8"));
             RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(decoded));
             //RSA加密
@@ -217,7 +215,6 @@ public class EncryptUtils {
     public static String deRSA(String str, String privateKey) {
         try {
             //64位解码加密后的字符串
-            //byte[] inputByte = Base64.decodeBase64(str.getBytes("UTF-8"));
             byte[] inputByte = Base64.getDecoder().decode(str.getBytes("UTF-8"));
             String outStr = new String(deRSA(inputByte, privateKey));
             return outStr;
@@ -237,7 +234,6 @@ public class EncryptUtils {
     public static byte[] deRSA(byte[] msg, String privateKey) {
         try {
             //base64编码的私钥
-            //byte[] decoded = Base64.decodeBase64(privateKey);
             byte[] decoded = Base64.getDecoder().decode(privateKey.getBytes("UTF-8"));
             RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(decoded));
             //RSA解密
@@ -337,7 +333,7 @@ public class EncryptUtils {
     public static byte[] enAES(byte[] msg, char[] key) {
         byte[] encrypted = null;
         try {
-            byte[] raw = IoUtils.toBytes(key);
+            byte[] raw = StrUtils.toBytes(key);
             SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");//"算法/模式/补码方式"
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
@@ -377,7 +373,7 @@ public class EncryptUtils {
     public static byte[] deAES(byte[] msg, char[] key) {
         byte[] original = null;
         try {
-            byte[] raw = IoUtils.toBytes(key);
+            byte[] raw = StrUtils.toBytes(key);
             SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, skeySpec);

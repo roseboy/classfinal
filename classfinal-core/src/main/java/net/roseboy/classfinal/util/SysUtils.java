@@ -81,39 +81,41 @@ public class SysUtils {
      * 获取mac地址
      *
      * @return mac 列表
-     * @throws Exception Exception
      */
-    public static List<String> getMacList() throws Exception {
+    public static List<String> getMacList() {
         ArrayList<String> list = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        java.util.Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
-        while (en.hasMoreElements()) {
-            NetworkInterface iface = en.nextElement();
-            List<InterfaceAddress> addrs = iface.getInterfaceAddresses();
-            for (InterfaceAddress addr : addrs) {
-                InetAddress ip = addr.getAddress();
-                if (ip.isLinkLocalAddress()) {//本地的不要
-                    continue;
-                }
-                NetworkInterface network = NetworkInterface.getByInetAddress(ip);
-                if (network == null) {
-                    continue;
-                }
-                byte[] mac = network.getHardwareAddress();
-                if (mac == null) {
-                    continue;
-                }
+        try {
+            java.util.Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
+            while (en.hasMoreElements()) {
+                NetworkInterface iface = en.nextElement();
+                List<InterfaceAddress> addrs = iface.getInterfaceAddresses();
+                for (InterfaceAddress addr : addrs) {
+                    InetAddress ip = addr.getAddress();
+                    if (ip.isLinkLocalAddress()) {//本地的不要
+                        continue;
+                    }
+                    NetworkInterface network = NetworkInterface.getByInetAddress(ip);
+                    if (network == null) {
+                        continue;
+                    }
+                    byte[] mac = network.getHardwareAddress();
+                    if (mac == null) {
+                        continue;
+                    }
 
-                sb.delete(0, sb.length());
-                for (int i = 0; i < mac.length; i++) {
-                    sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-                }
-                if (!list.contains(sb.toString())) {
-                    list.add(sb.toString());
+                    sb.delete(0, sb.length());
+                    for (int i = 0; i < mac.length; i++) {
+                        sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                    }
+                    if (!list.contains(sb.toString())) {
+                        list.add(sb.toString());
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
         return list;
     }
 
@@ -166,10 +168,19 @@ public class SysUtils {
         return "";
     }
 
-    public static void main(String[] args) throws Exception {
-        System.out.println(System.getProperty("os.name"));
-        System.out.println(getMacList());
-        System.out.println(getCPUSerialNumber());
-        System.out.println(getHardDiskSerialNumber());
+    /**
+     * 生成机器码
+     *
+     * @return 机器码
+     */
+    public static char[] makeMarchinCode() {
+        char[] c1 = EncryptUtils.md5(getMacList().toString().toCharArray());
+        char[] c2 = EncryptUtils.md5(getCPUSerialNumber().toCharArray());
+        char[] c3 = EncryptUtils.md5(getHardDiskSerialNumber().toCharArray());
+        char[] chars = StrUtils.merger(c1, c2, c3);
+        for (int i = 0; i < chars.length; i++) {
+            chars[i] = Character.toUpperCase(chars[i]);
+        }
+        return chars;
     }
 }

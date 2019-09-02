@@ -17,6 +17,7 @@ ClassFinal是一款java class文件安全加密工具，支持直接加密jar包
 * 支持spring framework、swagger等需要在启动过程中扫描注解或生成字节码的框架。
 * 支持maven插件，添加插件后在打包过程中自动加密。
 * 支持加密WEB-INF/lib或BOOT-INF/lib下的依赖jar包。
+* 支持绑定机器，项目加密后只能在特定机器运行。
 
 ## 环境依赖
 JDK 1.8 +
@@ -24,7 +25,7 @@ JDK 1.8 +
 ## 使用说明
 
 ### 下载
-[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.1.5/classfinal-fatjar-1.1.5.jar)
+[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.1.6/classfinal-fatjar-1.1.6.jar)
 
 ### 加密
 
@@ -42,6 +43,9 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
 -exclude     排除的类名(可为空,多个用","分割)
 -classpath   外部依赖的jar目录，例如/tomcat/lib(可为空,多个用","分割)
 -pwd         加密密码，如果时#号，则使用无密码模式加密
+-code        机器码，在绑定的机器生成，加密后只可在此机器上运行
+-nopwd       跳过输入密码，用于无密码模式
+-C           生成机器码
 -Y           无需确认，不加此参数会提示确认以上信息
 ```
 
@@ -52,7 +56,7 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
 
 ### maven插件方式
 
-在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.5。
+在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.6。
 ```xml
 <plugin>
     <groupId>net.roseboy</groupId>
@@ -77,6 +81,22 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
 运行mvn package时会在target下自动加密生成yourpaoject-encrypted.jar。
 
 maven插件的参数名称与直接运行的参数相同，请参考上节的参数说明。
+
+### 无密码模式
+
+加密时-pwd参数设为#，启动时可不用输入密码；
+如果是war包，启动时指定参数 -nopwd，跳过输密码过程。
+
+### 机器绑定
+
+机器绑定只允许加密的项目在特定的机器上运行；
+
+在需要绑定的机器上执行以下命令，生成机器码
+```sh
+java -jar classfinal-fatjar.jar -C
+```
+加密时用-code指定机器码。机器绑定可同时支持机器码+密码的方式加密。
+
 
 ### 启动加密后的jar
 
@@ -130,6 +150,7 @@ set JAVA_OPTS="-javaagent:classfinal-fatjar.jar='-pwd 000000'"
 
 
 ## 版本说明
+* v1.1.6 增加机器绑定功能
 * v1.1.5 增加无密码加密方式，启动无需输密码，但是并不安全
 * v1.1.4 纯命令行下运行jar时，从配置文件中读取密码，读取后清空文件
 * v1.1.3 加入输入密码的弹框

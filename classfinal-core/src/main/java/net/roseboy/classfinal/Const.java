@@ -20,7 +20,9 @@ public class Const {
     public static final int ENCRYPT_TYPE = 1;
 
     //密码标记
-    public static final String FLAG_PASS = "org.springframework.config.Pass";
+    public static final String CONFIG_PASS = "org.springframework.config.Pass.txt";
+    //机器码标记
+    public static final String CONFIG_CODE = "org.springframework.config.Code.txt";
 
     //调试模式
     public static boolean DEBUG = false;
@@ -29,7 +31,7 @@ public class Const {
         System.out.println();
         System.out.println("=========================================================");
         System.out.println("=                                                       =");
-        System.out.println("=      Java Class Encryption Tool v1.1.5   by Mr.K      =");
+        System.out.println("=      Java Class Encryption Tool v1.1.6   by Mr.K      =");
         System.out.println("=                                                       =");
         System.out.println("=========================================================");
         System.out.println();

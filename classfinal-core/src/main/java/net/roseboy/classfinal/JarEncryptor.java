@@ -28,6 +28,8 @@ public class JarEncryptor {
     private List<String> classPath = null;
     //密码
     private char[] password = null;
+    //机器码
+    private char[] code = null;
     //jar还是war
     private String jarOrWar = null;
     //工作目录
@@ -55,8 +57,9 @@ public class JarEncryptor {
      * @param excludeClass 排除的类名
      * @param classPath    依赖jar路径
      * @param password     密码
+     * @param code         机器码
      */
-    public JarEncryptor(String jarPath, char[] password, List<String> packages,
+    public JarEncryptor(String jarPath, char[] password, char[] code, List<String> packages,
                         List<String> includeJars, List<String> excludeClass, List<String> classPath) {
         super();
         this.jarPath = jarPath;
@@ -64,6 +67,7 @@ public class JarEncryptor {
         this.includeJars = includeJars;
         this.excludeClass = excludeClass;
         this.password = password;
+        this.code = code;
         this.classPath = classPath;
     }
 
@@ -85,6 +89,8 @@ public class JarEncryptor {
         if (password.length == 1 && password[0] == '#') {
             Log.debug("加密模式：无密码");
         }
+        Log.debug("机器绑定：" + (StrUtils.isEmpty(this.code) ? "否" : "是"));
+
         this.jarOrWar = jarPath.substring(jarPath.lastIndexOf(".") + 1);
         Log.debug("加密类型：" + jarOrWar);
         //临时work目录
@@ -128,16 +134,18 @@ public class JarEncryptor {
      * @param includeJars  -INF/lib下要加密的jar
      * @param excludeClass 排除的类名
      * @param password     密码
+     * @param code         机器码
      * @param classPath    外部依赖jar
      * @return 加密后文件的路径
      */
-    public String doEncryptJar(String jarPath, char[] password, List<String> packages,
+    public String doEncryptJar(String jarPath, char[] password, char[] code, List<String> packages,
                                List<String> includeJars, List<String> excludeClass, List<String> classPath) {
         this.jarPath = jarPath;
         this.packages = packages;
         this.includeJars = includeJars;
         this.excludeClass = excludeClass;
         this.password = password;
+        this.code = code;
         this.classPath = classPath;
         return this.doEncryptJar();
     }
@@ -182,17 +190,30 @@ public class JarEncryptor {
 
         //无密码模式,自动生成一个密码
         if (this.password.length == 1 && this.password[0] == '#') {
-            File configPass = new File(metaDir, Const.FLAG_PASS);
-            password = EncryptUtils.randChar(32);
-            IoUtils.writeFile(configPass, IoUtils.toBytes(password));
-            password = EncryptUtils.md5(password);
+            char[] randChars = EncryptUtils.randChar(32);
+            password = EncryptUtils.md5(randChars);
+            File configPass = new File(metaDir, Const.CONFIG_PASS);
+            IoUtils.writeFile(configPass, StrUtils.toBytes(randChars));
+
+        }
+
+        //有机器码
+        if (StrUtils.isNotEmpty(this.code)) {
+            File configPass = new File(metaDir, Const.CONFIG_CODE);
+            IoUtils.writeFile(configPass, StrUtils.toBytes(EncryptUtils.md5(this.code)));
         }
 
         //加密另存
         for (File classFile : classFiles) {
             String className = resolveClassName(classFile.getAbsolutePath(), true);
             byte[] bytes = IoUtils.readFileToByte(classFile);
-            bytes = EncryptUtils.en(bytes, IoUtils.merger(password, className.toCharArray()), Const.ENCRYPT_TYPE);
+            char[] pass = StrUtils.merger(this.password, className.toCharArray());
+            bytes = EncryptUtils.en(bytes, pass, Const.ENCRYPT_TYPE);
+            //有机器码，再用机器码加密一遍
+            if (StrUtils.isNotEmpty(this.code)) {
+                pass = StrUtils.merger(className.toCharArray(), this.code);
+                bytes = EncryptUtils.en(bytes, pass, Const.ENCRYPT_TYPE);
+            }
             File targetFile = new File(metaDir, className);
             IoUtils.writeFile(targetFile, bytes);
             encryptClasses.add(className);
@@ -325,6 +346,7 @@ public class JarEncryptor {
                 newTxt.append(txts[i]).append("\r\n");
                 if (txts[i].startsWith("Main-Class:")) {
                     newTxt.append("Premain-Class: ").append(CoreAgent.class.getName()).append("\r\n");
+                    //newTxt.append("Agent-Class: ").append(CoreAgent.class.getName()).append("\r\n");
                 }
             }
         } else {
