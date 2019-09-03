@@ -6,7 +6,6 @@ import javassist.compiler.CompileError;
 import javassist.compiler.Javac;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -193,28 +192,5 @@ public class ClassUtils {
             }
         }
         return false;
-    }
-
-    /**
-     * 获取class运行的classes目录或所在的jar包目录
-     *
-     * @return 路径字符串
-     */
-    public static String getRootPath() {
-        String path = ClassUtils.class.getResource("").getPath();
-        try {
-            path = java.net.URLDecoder.decode(path, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-        }
-        if (path.startsWith("file:")) {
-            path = path.substring(5);
-        }
-        if (path.contains("!")) {
-            path = path.substring(0, path.indexOf("!"));
-        }
-        if (path.contains("/classes/")) {
-            path = path.substring(0, path.indexOf("/classes/") + 9);
-        }
-        return path;
     }
 }

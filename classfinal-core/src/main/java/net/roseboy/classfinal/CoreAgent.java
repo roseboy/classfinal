@@ -1,5 +1,6 @@
 package net.roseboy.classfinal;
 
+
 import net.roseboy.classfinal.util.*;
 
 import java.io.Console;
@@ -30,7 +31,7 @@ public class CoreAgent {
         char[] pwd;
 
         //读取jar隐藏的密码，无密码启动模式(jar)
-        pwd = JarDecryptor.readPassFromJar(new File(ClassUtils.getRootPath()));
+        pwd = JarDecryptor.readPassFromJar(new File(JarUtils.getRootPath()));
 
         if (args != null) {
             options.parse(args.split(" "));
@@ -95,7 +96,7 @@ public class CoreAgent {
      * @return 密码
      */
     public static char[] readPasswordFromFile(CmdLineOption options) {
-        String path = ClassUtils.getRootPath();
+        String path = JarUtils.getRootPath();
         if (!path.endsWith(".jar")) {
             return null;
         }
@@ -133,28 +134,4 @@ public class CoreAgent {
         }
         return pwd;
     }
-
-    /**
-     * 项目启动后动态加载代理
-     *
-     * @param args args
-     * @param inst inst
-     */
-    public static void agentmain(String args, Instrumentation inst) {
-        premain(args, inst);
-    }
-
-    /**
-     * Main
-     *
-     * @param args args
-     * @throws Exception Exception
-     */
-//    public static void main(String[] args) throws Exception {
-//        String name = ManagementFactory.getRuntimeMXBean().getName();
-//        String pid = name.split("@")[0];
-//        VirtualMachine vm = VirtualMachine.attach(pid);
-//        vm.loadAgent(ClassUtils.getRootPath());
-//    }
-
 }

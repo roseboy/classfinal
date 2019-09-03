@@ -4,10 +4,7 @@ import javassist.ClassPool;
 import net.roseboy.classfinal.util.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * java class加密
@@ -310,16 +307,12 @@ public class JarEncryptor {
      */
     public void addClassFinalAgent() {
         List<String> paths = new ArrayList<>();
-        String p1 = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-        String p2 = ClassPool.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-        paths.add(p1);
-        paths.add(p2);
+        paths.add(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+        //paths.add(ClassPool.class.getProtectionDomain().getCodeSource().getLocation().getPath());
         for (String path : paths) {
             if (path.endsWith(".jar")) {
-                List<String> excludeFiles = new ArrayList<>();
-                excludeFiles.add("META-INF/MANIFEST.MF");
-                excludeFiles.add("说明.txt");
-                JarUtils.unJar(path, this.targetDir.getAbsolutePath(), null, excludeFiles);
+                List<String> includeFiles = Arrays.asList(Const.CLASSFINAL_FILES);
+                JarUtils.unJar(path, this.targetDir.getAbsolutePath(), null, includeFiles, null);
             } else if (path.endsWith("/classes/")) {
                 List<File> files = new ArrayList<>();
                 File pathFile = new File(path);
@@ -330,8 +323,10 @@ public class JarEncryptor {
                     if (file.isDirectory()) {
                         targetFile.mkdirs();
                     } else {
-                        byte[] bytes = IoUtils.readFileToByte(file);
-                        IoUtils.writeFile(targetFile, bytes);
+                        if (StrUtils.containsArray(file.getAbsolutePath(), Const.CLASSFINAL_FILES)) {
+                            byte[] bytes = IoUtils.readFileToByte(file);
+                            IoUtils.writeFile(targetFile, bytes);
+                        }
                     }
                 }
             }

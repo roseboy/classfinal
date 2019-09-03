@@ -7,9 +7,6 @@ package net.roseboy.classfinal;
  */
 public class Const {
 
-    //打包时需要删除的文件
-    public static final String[] DLE_FILES = {".DS_Store", "Thumbs.db"};
-
     //加密出来的文件名
     public static final String FILE_NAME = "classes";
 
@@ -20,9 +17,14 @@ public class Const {
     public static final int ENCRYPT_TYPE = 1;
 
     //密码标记
-    public static final String CONFIG_PASS = "org.springframework.config.Pass.txt";
+    public static final String CONFIG_PASS = "org.springframework.config.Pass";
     //机器码标记
-    public static final String CONFIG_CODE = "org.springframework.config.Code.txt";
+    public static final String CONFIG_CODE = "org.springframework.config.Code";
+    //本项目需要打包的代码
+    public static final String[] CLASSFINAL_FILES = {"CoreAgent.class", "InputForm.class","InputForm$1.class",
+            "JarDecryptor.class", "AgentTransformer.class", "Const.class", "CmdLineOption.class",
+            "EncryptUtils.class", "IoUtils.class", "JarUtils.class", "Log.class", "StrUtils.class",
+            "SysUtils.class"};
 
     //调试模式
     public static boolean DEBUG = false;

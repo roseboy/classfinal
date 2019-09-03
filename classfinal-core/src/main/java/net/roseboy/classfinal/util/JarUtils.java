@@ -16,6 +16,8 @@ import java.util.zip.ZipOutputStream;
  * @author roseboy
  */
 public class JarUtils {
+    //打包时需要删除的文件
+    public static final String[] DLE_FILES = {".DS_Store", "Thumbs.db"};
 
     /**
      * 把目录压缩成jar
@@ -47,7 +49,7 @@ public class JarUtils {
                     continue;
                 }
                 String fileName = file.getAbsolutePath().substring(jarDirFile.getAbsolutePath().length() + 1);
-                fileName=fileName.replace(File.separator, "/");
+                fileName = fileName.replace(File.separator, "/");
                 //目录，添加一个目录entry
                 if (file.isDirectory()) {
                     ZipEntry ze = new ZipEntry(fileName + "/");
@@ -94,7 +96,7 @@ public class JarUtils {
      * @return 所有文件的完整路径，包含目录
      */
     public static List<String> unJar(String jarPath, String targetDir, List<String> includeJars) {
-        return unJar(jarPath, targetDir, includeJars, null);
+        return unJar(jarPath, targetDir, includeJars, null, null);
     }
 
     /**
@@ -106,7 +108,8 @@ public class JarUtils {
      * @param excludeFiles 排除释放的文件，为空释放所有
      * @return 所有文件的完整路径，包含目录
      */
-    public static List<String> unJar(String jarPath, String targetDir, List<String> includeJars, List<String> excludeFiles) {
+    public static List<String> unJar(String jarPath, String targetDir, List<String> includeJars,
+                                     List<String> includeFiles, List<String> excludeFiles) {
         List<String> list = new ArrayList<>();
         File target = new File(targetDir);
         if (!target.exists()) {
@@ -123,7 +126,14 @@ public class JarUtils {
                 File targetFile = new File(target, entry.getName());
 
                 //跳过排除的文件
-                if (excludeFiles != null && (excludeFiles.contains(entry.getName()) || excludeFiles.contains(targetFile.getName()))) {
+                if (excludeFiles != null
+                        && (excludeFiles.contains(entry.getName()) || excludeFiles.contains(targetFile.getName()))) {
+                    continue;
+                }
+
+                //跳过未包含的文件
+                if (includeFiles != null && includeFiles.size() > 0 && !entry.isDirectory()
+                        && (!includeFiles.contains(entry.getName()) && !includeFiles.contains(targetFile.getName()))) {
                     continue;
                 }
 
@@ -135,7 +145,7 @@ public class JarUtils {
                     if (includeJars == null || includeJars.size() == 0 || includeJars.contains(jarName)) {
                         String targetPath0 = targetFile.getAbsolutePath();
                         String targetDir0 = targetFile.getAbsolutePath().replace(".jar", Const.LIB_JAR_DIR);
-                        List<String> list0 = unJar(targetPath0, targetDir0, includeJars, excludeFiles);
+                        List<String> list0 = unJar(targetPath0, targetDir0, includeJars, includeFiles, excludeFiles);
                         list.addAll(list0);
                     }
                 }
@@ -213,12 +223,35 @@ public class JarUtils {
      * @return 是否需要删除
      */
     public static boolean isDel(File file) {
-        for (String f : Const.DLE_FILES) {
+        for (String f : DLE_FILES) {
             if (file.getAbsolutePath().endsWith(f)) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * 获取class运行的classes目录或所在的jar包目录
+     *
+     * @return 路径字符串
+     */
+    public static String getRootPath() {
+        String path = JarUtils.class.getResource("").getPath();
+        try {
+            path = java.net.URLDecoder.decode(path, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+        }
+        if (path.startsWith("file:")) {
+            path = path.substring(5);
+        }
+        if (path.contains("!")) {
+            path = path.substring(0, path.indexOf("!"));
+        }
+        if (path.contains("/classes/")) {
+            path = path.substring(0, path.indexOf("/classes/") + 9);
+        }
+        return path;
     }
 
 }

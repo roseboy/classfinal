@@ -146,4 +146,21 @@ public class StrUtils {
         }
         return true;
     }
+
+
+    /**
+     * 字符串是否包含数组中的任意元素
+     *
+     * @param array 数组
+     * @param str   包含的字串
+     * @return 是否
+     */
+    public static boolean containsArray(String str, String[] array) {
+        for (String e : array) {
+            if (str.contains(e)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
