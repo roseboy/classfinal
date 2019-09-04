@@ -115,7 +115,8 @@ public class CoreAgent {
 
         if (StrUtils.isEmpty(args)) {
             Log.println("\nCould not get the password.");
-            Log.println("You can write the password(-pwd 123456 -del true) into the '" + path + "classfinal.txt' or '" + path + configName + "'.");
+            Log.println("You can write the password(-pwd 123456 -del true) into the '" + path
+                    + "classfinal.txt' or '" + path + configName + "'.");
             return null;
         }
         if (!args.contains(" ")) {

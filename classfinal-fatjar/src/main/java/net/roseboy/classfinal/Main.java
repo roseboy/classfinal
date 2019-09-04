@@ -99,7 +99,7 @@ public class Main {
                 excludeClass = "org.spring";//排除的类
                 password = "123456";
                 cpasspath = "/Users/roseboy/code-space/apache-tomcat-8.5.32/lib";
-                Const.DEBUG = true;
+                Const.DEBUG = false;
             } else if ("2".equals(path)) {
                 path = "/Users/roseboy/code-space/pig_project/target/pig_project_maven.war";
                 packages = "net.roseboy";//包名过滤
@@ -165,7 +165,7 @@ public class Main {
      * 生成机器码
      */
     public static void makeCode() {
-        String path = ClassUtils.getRootPath();
+        String path = JarUtils.getRootPath();
         path = path.substring(0, path.lastIndexOf("/") + 1);
 
         String code = new String(SysUtils.makeMarchinCode());
