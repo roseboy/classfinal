@@ -1,8 +1,11 @@
 package net.roseboy.classfinal;
 
+
 import net.roseboy.classfinal.util.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 
 /**
  * java class解密
@@ -11,7 +14,24 @@ import java.io.File;
  */
 public class JarDecryptor {
     private char[] code;//机器码
+    private String projectPath = null;//项目路径
+    private char[] password = null;//密码
 
+    //单例
+    private static final JarDecryptor single = new JarDecryptor();
+
+    /**
+     * 单例
+     *
+     * @return 单例
+     */
+    public static JarDecryptor getInstance() {
+        return single;
+    }
+
+    /**
+     * 构造
+     */
     public JarDecryptor() {
         code = SysUtils.makeMarchinCode();
     }
@@ -25,9 +45,11 @@ public class JarDecryptor {
      * @return 解密后的字节
      */
     public byte[] doDecrypt(String projectPath, String className, char[] password) {
+        this.projectPath = projectPath;
+        this.password = password;
+
         long t1 = System.currentTimeMillis();
         File workDir = new File(projectPath);
-
         String fileName = "META-INF/" + Const.FILE_NAME + "/" + className;
         byte[] bytes = readFile(workDir, fileName);
         if (bytes == null) {
@@ -100,5 +122,35 @@ public class JarDecryptor {
             return EncryptUtils.md5(pass);
         }
         return null;
+    }
+
+    /**
+     * 解密配置文件，spring读取文件时调用
+     *
+     * @param path 配置文件路径
+     * @param in   输入流
+     * @return 解密的输入流
+     */
+    public InputStream decryptConfigFile(String path, InputStream in) {
+        if (path.endsWith(".class")) {
+            return in;
+        }
+        if (this.password == null || this.projectPath == null) {
+            return in;
+        }
+        byte[] bytes = null;
+        try {
+            bytes = IoUtils.toBytes(in);
+        } catch (Exception e) {
+
+        }
+        if (bytes == null || bytes.length == 0) {//需要解密
+            bytes = this.doDecrypt(this.projectPath, path, this.password);
+        }
+        if (bytes == null) {
+            return in;
+        }
+        in = new ByteArrayInputStream(bytes);
+        return in;
     }
 }

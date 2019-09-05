@@ -1,10 +1,13 @@
 package net.roseboy.classfinal;
 
+import javassist.ClassPool;
+import javassist.CtClass;
 import net.roseboy.classfinal.util.StrUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
+import java.util.Arrays;
 
 
 /**
@@ -16,8 +19,6 @@ import java.security.ProtectionDomain;
 public class AgentTransformer implements ClassFileTransformer {
     //密码
     private char[] pwd;
-    //解密
-    private final JarDecryptor decryptor = new JarDecryptor();
 
     /**
      * 构造方法
@@ -42,9 +43,7 @@ public class AgentTransformer implements ClassFileTransformer {
 
         className = className.replace("/", ".").replace("\\", ".");
 
-        System.out.println("==》" + className);
-
-        byte[] bytes = decryptor.doDecrypt(projectPath, className, this.pwd);
+        byte[] bytes = JarDecryptor.getInstance().doDecrypt(projectPath, className, this.pwd);
         //CAFEBABE,表示解密成功
         if (bytes != null && bytes[0] == -54 && bytes[1] == -2 && bytes[2] == -70 && bytes[3] == -66) {
             return bytes;

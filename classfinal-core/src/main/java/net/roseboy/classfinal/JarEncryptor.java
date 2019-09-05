@@ -1,6 +1,8 @@
 package net.roseboy.classfinal;
 
 import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
 import net.roseboy.classfinal.util.*;
 
 import java.io.File;
@@ -92,7 +94,8 @@ public class JarEncryptor {
         Log.debug("加密类型：" + jarOrWar);
         //临时work目录
         this.targetDir = new File(jarPath.replace("." + jarOrWar, Const.LIB_JAR_DIR));
-        this.targetLibDir = new File(this.targetDir, ("jar".equals(jarOrWar) ? "BOOT-INF" : "WEB-INF") + File.separator + "lib");
+        this.targetLibDir = new File(this.targetDir, ("jar".equals(jarOrWar) ? "BOOT-INF" : "WEB-INF")
+                + File.separator + "lib");
         Log.debug("临时目录：" + targetDir);
 
         //[1]释放所有文件，内部jar只释放需要加密的jar
@@ -116,7 +119,10 @@ public class JarEncryptor {
         //[5]修改class方法体，并保存文件
         clearClassMethod(classFiles);
 
-        //[6]打包回去
+        //[6]加密配置文件
+        encryptConfigFile();
+
+        //[7]打包回去
         String result = packageJar();
 
         return result;
@@ -202,7 +208,10 @@ public class JarEncryptor {
 
         //加密另存
         for (File classFile : classFiles) {
-            String className = resolveClassName(classFile.getAbsolutePath(), true);
+            String className = classFile.getName();
+            if (className.endsWith(".class")) {
+                className = resolveClassName(classFile.getAbsolutePath(), true);
+            }
             byte[] bytes = IoUtils.readFileToByte(classFile);
             char[] pass = StrUtils.merger(this.password, className.toCharArray());
             bytes = EncryptUtils.en(bytes, pass, Const.ENCRYPT_TYPE);
@@ -373,7 +382,8 @@ public class JarEncryptor {
         String clsName;
         //lib内的的jar包
         if (file.contains(K_LIB)) {
-            clsName = file.substring(file.indexOf(Const.LIB_JAR_DIR, file.indexOf(K_LIB)) + Const.LIB_JAR_DIR.length() + 1);
+            clsName = file.substring(file.indexOf(Const.LIB_JAR_DIR, file.indexOf(K_LIB))
+                    + Const.LIB_JAR_DIR.length() + 1);
             clsPath = file.substring(0, file.length() - clsName.length() - 1);
         }
         //jar/war包-INF/classes下的class文件
@@ -390,6 +400,50 @@ public class JarEncryptor {
         result = classOrPath ? clsName.replace(File.separator, ".") : clsPath;
         resolveClassName.put(fileName + classOrPath, result);
         return result;
+    }
+
+    /**
+     * 加密class文件下的配置文件
+     */
+    private void encryptConfigFile() {
+        // org.springframework.core.io.ClassPathResource#getInputStream注入
+        // [1].读取配置文件时解密
+        String springClass = "org.springframework.core.io.ClassPathResource";
+        String javaCode = "is=net.roseboy.classfinal.JarDecryptor.getInstance().decryptConfigFile(this.path,is);";
+        ClassPool pool = ClassPool.getDefault();
+        ClassUtils.loadClassPath(pool, new File[]{this.targetLibDir});
+        try {
+            CtClass ct = pool.getCtClass(springClass);
+            CtMethod mt = ct.getDeclaredMethod("getInputStream");
+            mt.insertAt(999, javaCode);
+            byte[] bytes = ct.toBytecode();
+            File cls = new File(this.targetDir, springClass + ".class");
+            IoUtils.writeFile(cls, bytes);
+            List<File> clss = new ArrayList<>();
+            clss.add(cls);
+            encryptClass(clss);
+            cls.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //[2].加密
+        File classDir = new File(this.targetDir, ("jar".equals(jarOrWar) ? "BOOT-INF" : "WEB-INF")
+                + File.separator + "classes");
+        List<File> configFiles = new ArrayList<>();
+        File[] files = classDir.listFiles();
+        for (File file : files) {
+            if (file.isFile() && (file.getName().endsWith(".yml") || file.getName().endsWith(".yaml")
+                    || file.getName().endsWith(".properties"))) {
+                configFiles.add(file);
+            }
+        }
+        //加密
+        this.encryptClass(configFiles);
+        //清空
+        for (File file : configFiles) {
+            IoUtils.writeTxtFile(file, "");
+        }
     }
 
     /**

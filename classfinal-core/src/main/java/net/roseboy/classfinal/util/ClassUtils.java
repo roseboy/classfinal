@@ -110,9 +110,8 @@ public class ClassUtils {
      *
      * @param pool  javassist的ClassPool
      * @param files lib路径，
-     * @throws NotFoundException NotFoundException
      */
-    public static void loadClassPath(ClassPool pool, File[] files) throws NotFoundException {
+    public static void loadClassPath(ClassPool pool, File[] files) {
         for (File dir : files) {
             if (!dir.exists()) {
                 continue;
@@ -122,7 +121,10 @@ public class ClassUtils {
                 List<File> jars = new ArrayList<>();
                 IoUtils.listFile(jars, dir, ".jar");
                 for (File jar : jars) {
-                    pool.insertClassPath(jar.getAbsolutePath());
+                    try {
+                        pool.insertClassPath(jar.getAbsolutePath());
+                    } catch (NotFoundException e) {
+                    }
                 }
             }
         }
