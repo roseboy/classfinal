@@ -104,56 +104,73 @@ public class ClassUtils {
         }
     }
 
-
     /**
      * 加载jar包路径
      *
      * @param pool  javassist的ClassPool
-     * @param files lib路径，
+     * @param paths lib路径，
      */
-    public static void loadClassPath(ClassPool pool, File[] files) {
-        for (File dir : files) {
-            if (!dir.exists()) {
-                continue;
-            }
-
-            if (dir.isDirectory()) {
-                List<File> jars = new ArrayList<>();
-                IoUtils.listFile(jars, dir, ".jar");
-                for (File jar : jars) {
-                    try {
-                        pool.insertClassPath(jar.getAbsolutePath());
-                    } catch (NotFoundException e) {
-                    }
-                }
-            }
+    public static void loadClassPath(ClassPool pool, List<String> paths) {
+        for (String path : paths) {
+            loadClassPath(pool, new File(path));
         }
     }
 
     /**
      * 加载jar包路径
      *
-     * @param pool  javassist的ClassPool
-     * @param paths lib路径，
+     * @param pool javassist的ClassPool
+     * @param dir  lib路径或jar文件
      * @throws NotFoundException NotFoundException
      */
-    public static void loadClassPath(ClassPool pool, List<String> paths) throws NotFoundException {
-        for (String path : paths) {
-            File dir = new File(path);
-            if (!dir.exists()) {
-                continue;
-            }
+    public static void loadClassPath(ClassPool pool, File dir) {
+        if (dir == null || !dir.exists()) {
+            return;
+        }
 
-            if (dir.isDirectory()) {
-                List<File> jars = new ArrayList<>();
-                IoUtils.listFile(jars, dir, ".jar");
-                for (File jar : jars) {
+        if (dir.isDirectory()) {
+            List<File> jars = new ArrayList<>();
+            IoUtils.listFile(jars, dir, ".jar");
+            for (File jar : jars) {
+                try {
                     pool.insertClassPath(jar.getAbsolutePath());
+                } catch (NotFoundException e) {
+                    //ignore
                 }
-            } else if (dir.getAbsolutePath().endsWith(".jar")) {
+            }
+        } else if (dir.getName().endsWith(".jar")) {
+            try {
                 pool.insertClassPath(dir.getAbsolutePath());
+            } catch (NotFoundException e) {
+                //ignore
             }
         }
+    }
+
+    /**
+     * 给方法插入代码并返回bytecode的字节数组
+     *
+     * @param classMethod 类名#方法名
+     * @param javaCode    代码
+     * @param line        行数
+     * @param libDir      classpath
+     * @return 修改后的字节数组
+     */
+    public static byte[] insertCode(String classMethod, String javaCode, int line, File libDir) {
+        String className = classMethod.split("#")[0];
+        String methodName = classMethod.split("#")[1];
+        ClassPool pool = ClassPool.getDefault();
+        loadClassPath(pool, libDir);
+        byte[] bytes = null;
+        try {
+            CtClass ct = pool.getCtClass(className);
+            CtMethod mt = ct.getDeclaredMethod(methodName);
+            mt.insertAt(line, javaCode);
+            bytes = ct.toBytecode();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bytes;
     }
 
     /**

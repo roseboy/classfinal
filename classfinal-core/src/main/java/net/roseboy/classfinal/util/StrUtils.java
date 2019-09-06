@@ -149,7 +149,7 @@ public class StrUtils {
 
 
     /**
-     * 字符串是否包含数组中的任意元素
+     * 字符串是否包含数组中的任1元素
      *
      * @param array 数组
      * @param str   包含的字串
@@ -162,5 +162,43 @@ public class StrUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * 转换成字符串
+     *
+     * @param chars 字符数组
+     * @return 字符串
+     */
+    public static String toCharArrayCode(char[] chars) {
+        List<Integer> list = new ArrayList<>();
+        for (char c : chars) {
+            list.add((int) c);
+        }
+        return list.toString().replace("[", "{").replace("]", "}");
+    }
+
+    /**
+     * 在字符串的某个文职插入字符串
+     *
+     * @param arrayStr  字符串数组
+     * @param insertStr 要插入的字串
+     * @param pos       位置开始标识
+     * @return 插入后的字串
+     */
+    public static String insertStringArray(String[] arrayStr, String insertStr, String pos) {
+        StringBuffer newStr = new StringBuffer();
+        boolean isInsert = false;
+        for (int i = 0; i < arrayStr.length; i++) {
+            newStr.append(arrayStr[i]).append("\r\n");
+            if (arrayStr[i].startsWith(pos)) {
+                newStr.append(insertStr).append("\r\n");
+                isInsert = true;
+            }
+        }
+        if (!isInsert) {
+            newStr.append(insertStr).append("\r\n");
+        }
+        return newStr.toString();
     }
 }

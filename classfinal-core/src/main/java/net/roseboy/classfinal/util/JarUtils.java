@@ -236,22 +236,44 @@ public class JarUtils {
      *
      * @return 路径字符串
      */
-    public static String getRootPath() {
-        String path = JarUtils.class.getResource("").getPath();
+    public static String getRootPath(String path) {
+        if (path == null) {
+            path = JarUtils.class.getResource("").getPath();
+        }
+
         try {
             path = java.net.URLDecoder.decode(path, "utf-8");
         } catch (UnsupportedEncodingException e) {
         }
+
+        if (path.startsWith("jar:") || path.startsWith("war:")) {
+            path = path.substring(4);
+        }
         if (path.startsWith("file:")) {
             path = path.substring(5);
         }
-        if (path.contains("!")) {
-            path = path.substring(0, path.indexOf("!"));
+
+        //没解压的war包
+        if (path.contains("*")) {
+            return path.substring(0, path.indexOf("*"));
         }
-        if (path.contains("/classes/")) {
-            path = path.substring(0, path.indexOf("/classes/") + 9);
+        //war包解压后的WEB-INF
+        else if (path.contains("WEB-INF")) {
+            return path.substring(0, path.indexOf("WEB-INF"));
         }
-        return path;
+        //jar
+        else if (path.contains("!")) {
+            return path.substring(0, path.indexOf("!"));
+        }
+        //普通jar/war
+        else if (path.endsWith(".jar") || path.endsWith(".war")) {
+            return path;
+        }
+        //no
+        else if (path.contains("/classes/")) {
+            return path.substring(0, path.indexOf("/classes/") + 9);
+        }
+        return null;
     }
 
 }

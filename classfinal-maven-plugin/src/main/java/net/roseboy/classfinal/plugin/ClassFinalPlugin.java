@@ -35,19 +35,22 @@ public class ClassFinalPlugin extends AbstractMojo {
     private String code;
     //加密的内部-lib/jar名称
     @Parameter
-    String libjars;
+    private String libjars;
     //要加密的包名前缀
     @Parameter
-    String packages;
+    private String packages;
+    //要加密的配置文件名
+    @Parameter
+    private String cfgfiles;
     //排除的类名
     @Parameter
-    String excludes;
+    private String excludes;
     //外部依赖jarlib
     @Parameter
-    String classpath;
+    private String classpath;
     //调试
     @Parameter(defaultValue = "false")
-    Boolean debug;
+    private Boolean debug;
 
     /**
      * 打包的时候执行
@@ -69,12 +72,16 @@ public class ClassFinalPlugin extends AbstractMojo {
         List<String> packageList = StrUtils.toList(packages);
         List<String> excludeClassList = StrUtils.toList(excludes);
         List<String> classPathList = StrUtils.toList(classpath);
+        List<String> cfgFileList = StrUtils.toList(cfgfiles);
         includeJarList.add("-");
 
-        //加密过程
-        JarEncryptor encryptor = new JarEncryptor(targetJar, password.trim().toCharArray(),
-                StrUtils.isEmpty(code) ? null : code.trim().toCharArray(),
-                packageList, includeJarList, excludeClassList, classPathList);
+        JarEncryptor encryptor = new JarEncryptor(targetJar, password.trim().toCharArray());
+        encryptor.setCode(StrUtils.isEmpty(code) ? null : code.trim().toCharArray());
+        encryptor.setPackages(packageList);
+        encryptor.setIncludeJars(includeJarList);
+        encryptor.setExcludeClass(excludeClassList);
+        encryptor.setClassPath(classPathList);
+        encryptor.setCfgfiles(cfgFileList);
         String result = encryptor.doEncryptJar();
         long t2 = System.currentTimeMillis();
 

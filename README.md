@@ -40,12 +40,11 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
 -file        加密的jar/war完整路径
 -packages    加密的包名(可为空,多个用","分割)
 -libjars     jar/war包lib下要加密jar文件名(可为空,多个用","分割)
+-cfgfiles    需要加密的配置文件，一般是classes目录下的yml或properties文件(可为空,多个用","分割)
 -exclude     排除的类名(可为空,多个用","分割)
 -classpath   外部依赖的jar目录，例如/tomcat/lib(可为空,多个用","分割)
--pwd         加密密码，如果时#号，则使用无密码模式加密
+-pwd         加密密码，如果是#号，则使用无密码模式加密
 -code        机器码，在绑定的机器生成，加密后只可在此机器上运行
--nopwd       跳过输入密码，用于无密码模式
--C           生成机器码
 -Y           无需确认，不加此参数会提示确认以上信息
 ```
 
@@ -65,6 +64,7 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
     <configuration>
         <password>000000</password><!--加密打包之后pom.xml会被删除，不用担心在jar包里找到此密码-->
         <packages>com.yourpackage,com.yourpackage2</packages>
+        <cfgfiles>application.yml</cfgfiles>
         <excludes>org.spring</excludes>
         <libjars>a.jar,b.jar</libjars>
     </configuration>
@@ -159,9 +159,6 @@ set JAVA_OPTS="-javaagent:classfinal-fatjar.jar='-pwd 000000'"
 * v1.1.0 加密jar包时将解密代码加入加密后的jar包，无需使用多余的jar文件
 * v1.0.0 第一个正式版发布
 
-## QQ交流
-
-![QQ交流](https://gitee.com/roseboy/classfinal/raw/master/qqgroup.png "QQ交流")
 
 ## 协议声明
 [Apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)

@@ -214,6 +214,8 @@ public class IoUtils {
         BufferedWriter out = null;
         try {
             if (!file.exists()) {
+                file.mkdirs();
+                file.delete();
                 file.createNewFile();
             }
             out = new BufferedWriter(new FileWriter(file));

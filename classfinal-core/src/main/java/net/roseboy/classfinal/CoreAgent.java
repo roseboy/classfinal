@@ -31,7 +31,7 @@ public class CoreAgent {
         char[] pwd;
 
         //读取jar隐藏的密码，无密码启动模式(jar)
-        pwd = JarDecryptor.readPassFromJar(new File(JarUtils.getRootPath()));
+        pwd = JarDecryptor.readPassFromJar(new File(JarUtils.getRootPath(null)));
 
         if (args != null) {
             options.parse(args.split(" "));
@@ -96,7 +96,7 @@ public class CoreAgent {
      * @return 密码
      */
     public static char[] readPasswordFromFile(CmdLineOption options) {
-        String path = JarUtils.getRootPath();
+        String path = JarUtils.getRootPath(null);
         if (!path.endsWith(".jar")) {
             return null;
         }

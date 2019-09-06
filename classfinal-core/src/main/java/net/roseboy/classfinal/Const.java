@@ -8,7 +8,7 @@ package net.roseboy.classfinal;
 public class Const {
 
     //加密出来的文件名
-    public static final String FILE_NAME = "classes";
+    public static final String FILE_NAME = ".classes";
 
     //lib下的jar解压的目录名后缀
     public static final String LIB_JAR_DIR = "__temp__";

@@ -1,13 +1,10 @@
 package net.roseboy.classfinal;
 
-import javassist.ClassPool;
-import javassist.CtClass;
+import net.roseboy.classfinal.util.JarUtils;
 import net.roseboy.classfinal.util.StrUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
-import java.util.Arrays;
 
 
 /**
@@ -31,14 +28,16 @@ public class AgentTransformer implements ClassFileTransformer {
 
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
-                            ProtectionDomain protectionDomain, byte[] classfileBuffer) {
-        if (className == null || protectionDomain == null || loader == null) {
-            return classfileBuffer;
+                            ProtectionDomain domain, byte[] classBuffer) {
+        if (className == null || domain == null || loader == null) {
+            return classBuffer;
         }
 
-        String projectPath = projectPath(protectionDomain);
+        //获取类所在的项目运行路径
+        String projectPath = domain.getCodeSource().getLocation().getPath();
+        projectPath = JarUtils.getRootPath(projectPath);
         if (StrUtils.isEmpty(projectPath)) {
-            return classfileBuffer;
+            return classBuffer;
         }
 
         className = className.replace("/", ".").replace("\\", ".");
@@ -48,43 +47,7 @@ public class AgentTransformer implements ClassFileTransformer {
         if (bytes != null && bytes[0] == -54 && bytes[1] == -2 && bytes[2] == -70 && bytes[3] == -66) {
             return bytes;
         }
-        return classfileBuffer;
-
-    }
-
-    /**
-     * 获取项目运行的路径
-     *
-     * @param protectionDomain protectionDomain
-     * @return 路径
-     */
-    private String projectPath(ProtectionDomain protectionDomain) {
-        String path = protectionDomain.getCodeSource().getLocation().getPath();
-        try {
-            path = java.net.URLDecoder.decode(path, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-        }
-
-        if (path.startsWith("file:")) {
-            path = path.substring(5);
-        }
-        //没解压的war包
-        if (path.contains("*")) {
-            return path.substring(0, path.indexOf("*"));
-        }
-        //war包解压后的WEB-INF/classes目录 或 war包解压后WEB-INF/lib
-        else if (path.contains("WEB-INF")) {
-            return path.substring(0, path.indexOf("WEB-INF"));
-        }
-        //spring-boot项目
-        else if (path.contains("!")) {
-            return path.substring(0, path.indexOf("!"));
-        }
-        //普通jar/war
-        else if (path.endsWith(".jar") || path.endsWith(".war")) {
-            return path;
-        }
-        return null;
+        return classBuffer;
 
     }
 }
