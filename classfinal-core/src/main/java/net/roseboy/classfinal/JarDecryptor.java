@@ -13,12 +13,12 @@ import java.io.InputStream;
  * @author roseboy
  */
 public class JarDecryptor {
+    //单例
+    private static final JarDecryptor single = new JarDecryptor();
     private char[] code;//机器码
     private String projectPath = null;//项目路径
     private char[] password = null;//密码
 
-    //单例
-    private static final JarDecryptor single = new JarDecryptor();
 
     /**
      * 单例

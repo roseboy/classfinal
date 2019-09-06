@@ -120,7 +120,9 @@ public class JarEncryptor {
         clearClassMethod(classFiles);
 
         //[6]加密配置文件
-        encryptConfigFile();
+        if ("jar".equalsIgnoreCase(this.jarOrWar)) {
+            encryptConfigFile();
+        }
 
         //[7]打包回去
         String result = packageJar();
@@ -403,10 +405,10 @@ public class JarEncryptor {
     }
 
     /**
-     * 加密class文件下的配置文件
+     * 加密classes下的配置文件
      */
     private void encryptConfigFile() {
-        // org.springframework.core.io.ClassPathResource#getInputStream注入
+        // org.springframework.core.io.ClassPathResource#getInputStream注入解密功能
         // [1].读取配置文件时解密
         String springClass = "org.springframework.core.io.ClassPathResource";
         String javaCode = "is=net.roseboy.classfinal.JarDecryptor.getInstance().decryptConfigFile(this.path,is);";
