@@ -13,6 +13,21 @@ import java.util.*;
  * @author roseboy
  */
 public class JarEncryptor {
+    //加密配置文件：加载配置文件是注入解密代码的配置
+    static Map<String, String> aopMap = new HashMap<>();
+
+    static {
+        //org.springframework.core.io.ClassPathResource#getInputStream注入解密功能
+        aopMap.put("spring.class", "org.springframework.core.io.ClassPathResource#getInputStream");
+        aopMap.put("spring.code", "char[] c=${passchar};"
+                + "is=net.roseboy.classfinal.JarDecryptor.getInstance().decryptConfigFile(this.path,is,c);");
+        aopMap.put("spring.line", "999");
+
+        //com.jfinal.kit.Prop#getInputStream注入解密功能
+        aopMap.put("jfinal.class", "com.jfinal.kit.Prop#<Prop>(java.lang.String,java.lang.String)");
+        aopMap.put("jfinal.code", "char[] c=${passchar};inputStream=net.roseboy.classfinal.JarDecryptor.getInstance().decryptConfigFile(fileName,inputStream,c);");
+        aopMap.put("jfinal.line", "62");
+    }
 
     //要加密的jar或war
     private String jarPath = null;
@@ -89,6 +104,18 @@ public class JarEncryptor {
         //[1]释放所有文件，内部jar只释放需要加密的jar
         List<String> allFile = JarUtils.unJar(jarPath, this.targetDir.getAbsolutePath(), includeJars);
         allFile.forEach(s -> Log.debug("释放：" + s));
+
+        //压缩静态文件
+//        allFile.forEach(s -> {
+//            if (!s.endsWith(".ftl")) {
+//                return;
+//            }
+//            File file = new File(s);
+//            String code = IoUtils.readTxtFile(file);
+//            code = HtmlUtils.removeComments(code);
+//            code = HtmlUtils.removeBlankLine(code);
+//            IoUtils.writeTxtFile(file, code);
+//        });
 
         //[2]提取所有需要加密的class文件
         List<File> classFiles = filterClasses(allFile);
@@ -298,21 +325,31 @@ public class JarEncryptor {
             return;
         }
 
-        // org.springframework.core.io.ClassPathResource#getInputStream注入解密功能
-        // [1].读取配置文件时解密
-        String springClass = "org.springframework.core.io.ClassPathResource#getInputStream";
-        String javaCode = "char[] c=" + StrUtils.toCharArrayCode(this.password)
-                + ";is=net.roseboy.classfinal.JarDecryptor.getInstance().decryptConfigFile(this.path,is,c);";
+        //支持的框架
+        String[] supportFrame = {"spring", "jfinal"};
 
-        byte[] bytes = ClassUtils.insertCode(springClass, javaCode, 999, this.targetLibDir);
-        if (bytes != null) {
-            File cls = new File(this.targetDir, springClass.split("#")[0] + ".class");
-            IoUtils.writeFile(cls, bytes);
-            List<File> clss = new ArrayList<>();
-            clss.add(cls);
-            encryptClass(clss);
-            cls.delete();
-        }
+        // [1].读取配置文件时解密
+        Arrays.asList(supportFrame).forEach(name -> {
+            String javaCode = aopMap.get(name + ".code");
+            String clazz = aopMap.get(name + ".class");
+            Integer line = Integer.parseInt(aopMap.get(name + ".line"));
+            javaCode = javaCode.replace("${passchar}", StrUtils.toCharArrayCode(this.password));
+            byte[] bytes = null;
+            try {
+                bytes = ClassUtils.insertCode(clazz, javaCode, line, this.targetLibDir);
+            } catch (Exception e) {
+                Log.debug(e.getClass().getName() + ":" + e.getMessage());
+            }
+            if (bytes != null) {
+                File cls = new File(this.targetDir, clazz.split("#")[0] + ".class");
+                IoUtils.writeFile(cls, bytes);
+                List<File> clss = new ArrayList<>();
+                clss.add(cls);
+                encryptClass(clss);
+                cls.delete();
+            }
+        });
+
 
         //[2].加密
         List<File> configFiles = new ArrayList<>();

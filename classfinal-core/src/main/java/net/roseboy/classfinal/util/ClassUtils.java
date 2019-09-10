@@ -156,20 +156,26 @@ public class ClassUtils {
      * @param libDir      classpath
      * @return 修改后的字节数组
      */
-    public static byte[] insertCode(String classMethod, String javaCode, int line, File libDir) {
+    public static byte[] insertCode(String classMethod, String javaCode, int line, File libDir) throws Exception {
         String className = classMethod.split("#")[0];
         String methodName = classMethod.split("#")[1];
         ClassPool pool = ClassPool.getDefault();
         loadClassPath(pool, libDir);
-        byte[] bytes = null;
-        try {
-            CtClass ct = pool.getCtClass(className);
-            CtMethod mt = ct.getDeclaredMethod(methodName);
+        byte[] bytes;
+        CtClass cc = pool.getCtClass(className);
+        if (methodName.startsWith("<") && methodName.contains(">")) {
+            methodName = methodName.replace("<", "").replace(">", "");
+            CtConstructor[] ms = cc.getConstructors();
+            for (CtConstructor mt : ms) {
+                if (mt.getLongName().endsWith(methodName)) {
+                    mt.insertAt(line, javaCode);
+                }
+            }
+        } else {
+            CtMethod mt = cc.getDeclaredMethod(methodName);
             mt.insertAt(line, javaCode);
-            bytes = ct.toBytecode();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        bytes = cc.toBytecode();
         return bytes;
     }
 
