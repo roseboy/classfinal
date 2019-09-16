@@ -18,6 +18,7 @@ ClassFinal是一款java class文件安全加密工具，支持直接加密jar包
 * 支持maven插件，添加插件后在打包过程中自动加密。
 * 支持加密WEB-INF/lib或BOOT-INF/lib下的依赖jar包。
 * 支持绑定机器，项目加密后只能在特定机器运行。
+* 支持加密springboot的配置文件。
 
 ## 环境依赖
 JDK 1.8 +
@@ -25,7 +26,7 @@ JDK 1.8 +
 ## 使用说明
 
 ### 下载
-[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.1.6/classfinal-fatjar-1.1.6.jar)
+[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.1.7/classfinal-fatjar-1.1.7.jar)
 
 ### 加密
 
@@ -55,7 +56,7 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
 
 ### maven插件方式
 
-在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.6。
+在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.7。
 ```xml
 <plugin>
     <groupId>net.roseboy</groupId>
@@ -109,7 +110,9 @@ java -jar classfinal-fatjar.jar -C
 ```sh
 java -javaagent:yourpaoject-encrypted.jar='-pwd 0000000' -jar yourpaoject-encrypted.jar
 
-//参数说明 -pwd   加密项目的密码  
+//参数说明
+// -pwd      加密项目的密码  
+// -pwdname  环境变量中密码的名字
 ```
 
 或者不加pwd参数直接启动，启动后在控制台里输入密码，推荐使用这种方式：
@@ -118,6 +121,7 @@ java -javaagent:yourpaoject-encrypted.jar='-pwd 0000000' -jar yourpaoject-encryp
 java -javaagent:yourpaoject-encrypted.jar -jar yourpaoject-encrypted.jar
 ```
 使用nohup命令启动时，如果系统支持gui，会弹出输入密码的界面，如果是纯命令行下，不支持gui，则需要在同级目录下的classfinal.txt或yourpaoject-encrypted.classfinal.txt中写入密码，项目读取到密码后会清空此文件。
+
 
 
 ### tomcat下运行加密后的war
@@ -136,7 +140,7 @@ set JAVA_OPTS="-javaagent:classfinal-fatjar.jar='-pwd 000000'"
 //参数说明 
 // -pwd      加密项目的密码  
 // -nopwd    无密码加密时启动加上此参数，跳过输密码过程
-
+// -pwdname  环境变量中密码的名字
 ```
 
 -------------------------
@@ -148,8 +152,11 @@ set JAVA_OPTS="-javaagent:classfinal-fatjar.jar='-pwd 000000'"
 > 本工具加密后，原始的class文件并不会完全被加密，只是方法体被清空，保留方法参数、注解等信息，这是为了兼容spring，swagger等扫描注解的框架；
 方法体被清空后，反编译者只能看到方法名和注解，看不到方法的具体内容；当class被classloader加载时，真正的方法体会被解密注入。
 
+> 为了保证项目在运行时的安全，启动jvm时请加参数:  -XX:+DisableAttachMechanism 。
+
 
 ## 版本说明
+* v1.1.7 支持加密springboot的配置文件；增加环境变量中读取密码
 * v1.1.6 增加机器绑定功能
 * v1.1.5 增加无密码加密方式，启动无需输密码，但是并不安全
 * v1.1.4 纯命令行下运行jar时，从配置文件中读取密码，读取后清空文件

@@ -24,9 +24,10 @@ public class CoreAgent {
         Const.pringInfo();
         CmdLineOption options = new CmdLineOption();
         options.addOption("pwd", true, "密码");
+        options.addOption("pwdname", true, "环境变量密码参数名");
+        options.addOption("nopwd", false, "无密码启动");
         options.addOption("debug", false, "调试模式");
         options.addOption("del", true, "读取密码后删除密码");
-        options.addOption("nopwd", false, "无密码启动");
 
         char[] pwd;
 
@@ -49,7 +50,16 @@ public class CoreAgent {
             pwd = options.getOptionValue("pwd", "").toCharArray();
         }
 
-        // 参数没密码，从控制台获取输入
+        //参数没密码，读取环境变量中的密码
+        if (StrUtils.isEmpty(pwd)) {
+            String pwdname = options.getOptionValue("pwdname");
+            if (StrUtils.isNotEmpty(pwdname)) {
+                String p = System.getenv(pwdname);
+                pwd = p == null ? null : p.toCharArray();
+            }
+        }
+
+        // 参数没密码，环境变量没密码，从控制台获取输入
         if (StrUtils.isEmpty(pwd)) {
             Log.debug("无法在参数中获取密码，从控制台获取");
             Console console = System.console();
