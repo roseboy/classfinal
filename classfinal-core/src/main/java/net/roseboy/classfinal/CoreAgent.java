@@ -59,7 +59,13 @@ public class CoreAgent {
             }
         }
 
-        // 参数没密码，环境变量没密码，从控制台获取输入
+        //参数、环境变量都没密码，读取密码配置文件
+        if (StrUtils.isEmpty(pwd)) {
+            Log.debug("无法从GUI中获取密码，读取密码文件");
+            pwd = readPasswordFromFile(options);
+        }
+
+        // 配置文件没密码，从控制台获取输入
         if (StrUtils.isEmpty(pwd)) {
             Log.debug("无法在参数中获取密码，从控制台获取");
             Console console = System.console();
@@ -81,18 +87,25 @@ public class CoreAgent {
             }
         }
 
-        //不支持gui，读取密码配置文件
-        if (StrUtils.isEmpty(pwd)) {
-            Log.debug("无法从GUI中获取密码，读取密码文件");
-            pwd = readPasswordFromFile(options);
-        }
-
         //还是没有获取密码，退出
         if (StrUtils.isEmpty(pwd)) {
             Log.println("\nERROR: Startup failed, could not get the password.\n");
             System.exit(0);
         }
 
+        //验证密码,jar包是才验证
+        byte[] passHash = JarDecryptor.readEncryptedFile(new File(JarUtils.getRootPath(null)), Const.CONFIG_PASSHASH);
+        if(passHash!=null){
+            char[] p1 = StrUtils.toChars(passHash);
+            char[] p2 = EncryptUtils.md5(StrUtils.merger(pwd, EncryptUtils.SALT));
+            p2 = EncryptUtils.md5(StrUtils.merger(EncryptUtils.SALT, p2));
+            if (!StrUtils.equal(p1, p2)) {
+                Log.println("\nERROR: Startup failed, invalid password.\n");
+                System.exit(0);
+            }
+        }
+
+        //GO
         if (inst != null) {
             AgentTransformer tran = new AgentTransformer(pwd);
             inst.addTransformer(tran);
@@ -124,11 +137,10 @@ public class CoreAgent {
         }
 
         if (StrUtils.isEmpty(args)) {
-            Log.println("\nCould not get the password.");
-            Log.println("You can write the password(-pwd 123456 -del true) into the '" + path
-                    + "classfinal.txt' or '" + path + configName + "'.");
             return null;
         }
+
+        //不包含空格文件存的就是密码
         if (!args.contains(" ")) {
             return args.trim().toCharArray();
         }

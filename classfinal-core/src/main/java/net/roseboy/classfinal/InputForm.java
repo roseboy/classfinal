@@ -118,4 +118,13 @@ public class InputForm {
             }
         };
     }
+
+    public static void main(String[] args) {
+        InputForm input = new InputForm();
+        boolean gui = input.showForm();
+        if (gui) {
+            System.out.println(input.nextPasswordLine());
+            input.closeForm();
+        }
+    }
 }

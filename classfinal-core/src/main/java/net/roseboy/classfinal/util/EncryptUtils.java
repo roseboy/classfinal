@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class EncryptUtils {
     //盐
-    private static final char[] SALT = {'w', 'h', 'o', 'i', 's', 'y', 'o', 'u', 'r', 'd', 'a', 'd', 'd', 'y', '#', '$', '@', '#', '@'};
+    public static final char[] SALT = {'w', 'h', 'o', 'i', 's', 'y', 'o', 'u', 'r', 'd', 'a', 'd', 'd', 'y', '#', '$', '@', '#', '@'};
     //rsa 长度
     private static int KEY_LENGTH = 1024;
 

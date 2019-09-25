@@ -121,7 +121,6 @@ public class ClassUtils {
      *
      * @param pool javassist的ClassPool
      * @param dir  lib路径或jar文件
-     * @throws NotFoundException NotFoundException
      */
     public static void loadClassPath(ClassPool pool, File dir) {
         if (dir == null || !dir.exists()) {
@@ -155,6 +154,7 @@ public class ClassUtils {
      * @param line        行数
      * @param libDir      classpath
      * @return 修改后的字节数组
+     * @throws Exception Exception
      */
     public static byte[] insertCode(String classMethod, String javaCode, int line, File libDir) throws Exception {
         String className = classMethod.split("#")[0];

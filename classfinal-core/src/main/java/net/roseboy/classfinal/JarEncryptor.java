@@ -185,7 +185,6 @@ public class JarEncryptor {
             this.password = EncryptUtils.md5(randChars);
             File configPass = new File(metaDir, Const.CONFIG_PASS);
             IoUtils.writeFile(configPass, StrUtils.toBytes(randChars));
-
         }
 
         //有机器码
@@ -213,6 +212,11 @@ public class JarEncryptor {
             encryptClasses.add(className);
             Log.debug("加密：" + className);
         });
+
+        //加密密码hash存储，用来验证密码是否正确
+        char[] pchar = EncryptUtils.md5(StrUtils.merger(this.password, EncryptUtils.SALT));
+        pchar = EncryptUtils.md5(StrUtils.merger(EncryptUtils.SALT, pchar));
+        IoUtils.writeFile(new File(metaDir, Const.CONFIG_PASSHASH), StrUtils.toBytes(pchar));
 
         return encryptClasses;
     }
@@ -327,6 +331,8 @@ public class JarEncryptor {
 
         //支持的框架
         String[] supportFrame = {"spring", "jfinal"};
+        //需要注入解密功能的class
+        List<File> aopClass = new ArrayList<>(supportFrame.length);
 
         // [1].读取配置文件时解密
         Arrays.asList(supportFrame).forEach(name -> {
@@ -343,12 +349,12 @@ public class JarEncryptor {
             if (bytes != null) {
                 File cls = new File(this.targetDir, clazz.split("#")[0] + ".class");
                 IoUtils.writeFile(cls, bytes);
-                List<File> clss = new ArrayList<>();
-                clss.add(cls);
-                encryptClass(clss);
-                cls.delete();
+                aopClass.add(cls);
             }
         });
+
+        encryptClass(aopClass);
+        aopClass.forEach(cls -> cls.delete());
 
 
         //[2].加密
