@@ -6,7 +6,7 @@ ClassFinal是一款java class文件安全加密工具，支持直接加密jar包
 ##### Gitee: https://gitee.com/roseboy/classfinal
 
 ## 项目模块说明
-* **classfinal-core:** ClassFinalde的核心模块，几乎所有加密的代码都在这里；
+* **classfinal-core:** ClassFinal的核心模块，几乎所有加密的代码都在这里；
 * **classfinal-fatjar:** ClassFinal打包成独立运行的jar包；
 * **classfinal-maven-plugin:** ClassFinal加密的maven插件；
 
@@ -121,6 +121,7 @@ java -javaagent:yourpaoject-encrypted.jar='-pwd 0000000' -jar yourpaoject-encryp
 java -javaagent:yourpaoject-encrypted.jar -jar yourpaoject-encrypted.jar
 ```
 ~~使用nohup命令启动时，如果系统支持gui，会弹出输入密码的界面，如果是纯命令行下，不支持gui，则需要在同级目录下的classfinal.txt或yourpaoject-encrypted.classfinal.txt中写入密码，项目读取到密码后会清空此文件。~~
+
 密码读取顺序已经改为：参数获取密码||环境变量获取密码||密码文件获取密码||控制台输入密码||GUI输入密码||退出
 
 
