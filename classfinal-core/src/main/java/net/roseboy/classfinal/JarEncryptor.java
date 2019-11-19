@@ -360,6 +360,9 @@ public class JarEncryptor {
         //[2].加密
         List<File> configFiles = new ArrayList<>();
         File[] files = this.targetClassesDir.listFiles();
+        if (files == null) {
+            return;
+        }
         for (File file : files) {
             if (file.isFile() && ClassUtils.isClass(this.cfgfiles, file.getName())) {
                 configFiles.add(file);
