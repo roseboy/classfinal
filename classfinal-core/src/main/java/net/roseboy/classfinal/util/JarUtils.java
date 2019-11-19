@@ -120,11 +120,24 @@ public class JarUtils {
         ZipFile zipFile = null;
         try {
             zipFile = new ZipFile(new File(jarPath));
+
+            //先把文件夹创建出来
             Enumeration<?> entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry) entries.nextElement();
                 File targetFile = new File(target, entry.getName());
+                if (entry.isDirectory()) {
+                    if (!targetFile.exists()) {
+                        targetFile.mkdirs();
+                    }
+                }
+            }
 
+            //再释放文件
+            entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = (ZipEntry) entries.nextElement();
+                File targetFile = new File(target, entry.getName());
                 //跳过排除的文件
                 if (excludeFiles != null
                         && (excludeFiles.contains(entry.getName()) || excludeFiles.contains(targetFile.getName()))) {

@@ -472,4 +472,5 @@ public class JarEncryptor {
     public void setCode(char[] code) {
         this.code = code;
     }
+
 }

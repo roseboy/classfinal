@@ -24,6 +24,7 @@ public class IoUtils {
             os.write(fileBytes, 0, fileBytes.length);
             os.flush();
         } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             close(os);
         }
