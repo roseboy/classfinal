@@ -106,8 +106,13 @@ public class Main {
             password = "#";
             classpath = "/Users/roseboy/code-space/apache-tomcat-8.5.32/lib";
             Const.DEBUG = true;
+        } else if ("3".equals(path)) {
+            path = "/Users/roseboy/Desktop/jc.jar";
+            packages = "com,net";//包名过滤
+            password = "#";
+            cfgfiles="aa.ini";
+            Const.DEBUG = true;
         }
-
 
         Log.println();
         Log.println("加密信息如下:");

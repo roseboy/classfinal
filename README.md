@@ -26,7 +26,7 @@ JDK 1.8 +
 ## 使用说明
 
 ### 下载
-[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.1.7/classfinal-fatjar-1.1.7.jar)
+[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.1.8/classfinal-fatjar-1.1.8.jar)
 
 ### 加密
 
@@ -56,7 +56,7 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
 
 ### maven插件方式
 
-在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.7。
+在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.8。
 ```xml
 <plugin>
     <groupId>net.roseboy</groupId>
@@ -157,7 +157,7 @@ set JAVA_OPTS="-javaagent:classfinal-fatjar.jar='-pwd 000000'"
 
 
 ## 版本说明
-* v1.1.7 支持加密springboot的配置文件；增加环境变量中读取密码
+* v1.1.8 支持加密springboot的配置文件；增加环境变量中读取密码
 * v1.1.6 增加机器绑定功能
 * v1.1.5 增加无密码加密方式，启动无需输密码，但是并不安全
 * v1.1.4 纯命令行下运行jar时，从配置文件中读取密码，读取后清空文件
