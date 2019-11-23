@@ -330,7 +330,8 @@ public class JarEncryptor {
         }
 
         //支持的框架
-        String[] supportFrame = {"spring", "jfinal"};
+        //String[] supportFrame = {"spring", "jfinal"};
+        String[] supportFrame = {"spring"};
         //需要注入解密功能的class
         List<File> aopClass = new ArrayList<>(supportFrame.length);
 
@@ -342,8 +343,10 @@ public class JarEncryptor {
             javaCode = javaCode.replace("${passchar}", StrUtils.toCharArrayCode(this.password));
             byte[] bytes = null;
             try {
-                bytes = ClassUtils.insertCode(clazz, javaCode, line, this.targetLibDir);
+                String thisJar=this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+                bytes = ClassUtils.insertCode(clazz, javaCode, line, this.targetLibDir,new File(thisJar));
             } catch (Exception e) {
+                e.printStackTrace();
                 Log.debug(e.getClass().getName() + ":" + e.getMessage());
             }
             if (bytes != null) {
