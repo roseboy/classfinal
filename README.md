@@ -26,7 +26,7 @@ JDK 1.8 +
 ## 使用说明
 
 ### 下载
-[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.1.8/classfinal-fatjar-1.1.8.jar)
+[点此下载](http://repo.maven.apache.org/maven2/net/roseboy/classfinal-fatjar/1.1.9/classfinal-fatjar-1.1.9.jar)
 
 ### 加密
 
@@ -56,7 +56,7 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
 
 ### maven插件方式
 
-在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.8。
+在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.9。
 ```xml
 <plugin>
     <groupId>net.roseboy</groupId>
