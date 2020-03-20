@@ -344,6 +344,7 @@ public class JarEncryptor {
             byte[] bytes = null;
             try {
                 String thisJar=this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+                //获取 框架 读取 配置文件的类,将密码注入该类
                 bytes = ClassUtils.insertCode(clazz, javaCode, line, this.targetLibDir,new File(thisJar));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -356,11 +357,12 @@ public class JarEncryptor {
             }
         });
 
-        encryptClass(aopClass);
+        //加密读取配置文件的类
+        this.encryptClass(aopClass);
         aopClass.forEach(cls -> cls.delete());
 
 
-        //[2].加密
+        //[2].加密配置文件
         List<File> configFiles = new ArrayList<>();
         File[] files = this.targetClassesDir.listFiles();
         if (files == null) {

@@ -59,6 +59,7 @@ java -jar classfinal-fatjar.jar -file yourpaoject.jar -libjars a.jar,b.jar -pack
 在要加密的项目pom.xml中加入以下插件配置,目前最新版本是：1.1.9。
 ```xml
 <plugin>
+    <!-- https://gitee.com/roseboy/classfinal -->
     <groupId>net.roseboy</groupId>
     <artifactId>classfinal-maven-plugin</artifactId>
     <version>${classfinal.version}</version>

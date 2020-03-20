@@ -1,0 +1,20 @@
+server:
+  port: 59999
+logging:
+  config: classpath:logback-spring.xml
+spring:
+  application:
+    name: k
+  resources:
+    static-locations: classpath:/static/
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    timeZone: GMT+08:00
+  freemarker:
+    cache: false
+    template-loader-path: classpath:/templates/
+    prefer-file-system-access: false
+  http:
+    encoding:
+      charset: UTF-8
+      force: true

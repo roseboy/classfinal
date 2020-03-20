@@ -5,13 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>net.roseboy</groupId>
-        <artifactId>classfinal</artifactId>
-        <version>1.1.9</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.3.RELEASE</version>
+        <relativePath/>
     </parent>
 
     <artifactId>classfinal-web</artifactId>
     <packaging>jar</packaging>
+    <version>1.1.9</version>
 
     <name>classfinal-web</name>
 
@@ -19,6 +21,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <tomcat.version>8.5.51</tomcat.version>
     </properties>
 
     <dependencies>
@@ -27,10 +30,25 @@
             <artifactId>classfinal-core</artifactId>
             <version>1.1.9</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>
-            
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <fork>true</fork>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

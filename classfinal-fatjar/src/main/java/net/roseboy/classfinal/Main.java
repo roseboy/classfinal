@@ -22,6 +22,12 @@ public class Main {
      * @param args 参数
      */
     public static void main(String[] args) {
+
+
+
+
+
+
         Const.pringInfo();
         Scanner scanner = new Scanner(System.in);
 
