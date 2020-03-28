@@ -162,7 +162,7 @@ public class ClassUtils {
         String methodName = classMethod.split("#")[1];
         ClassPool pool = ClassPool.getDefault();
         loadClassPath(pool, libDir);
-        if(thisJar!=null && thisJar.exists()){
+        if (thisJar != null && thisJar.exists()) {
             loadClassPath(pool, thisJar);
         }
         byte[] bytes;
@@ -183,43 +183,4 @@ public class ClassUtils {
         return bytes;
     }
 
-    /**
-     * 判断是否是某个包名
-     *
-     * @param encryptPackage 允许的包名
-     * @param className      要判断的类名
-     * @return 是否属于
-     */
-    public static boolean isPackage(List<String> encryptPackage, String className) {
-        if (encryptPackage == null || encryptPackage.size() == 0) {
-            return true;
-        }
-
-        for (String pkg : encryptPackage) {
-            if (className.startsWith(pkg)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 判断是否是某个类名
-     *
-     * @param classes   过滤的类名
-     * @param className 要判断的类名
-     * @return 是否属于
-     */
-    public static boolean isClass(List<String> classes, String className) {
-        if (classes == null || classes.size() == 0) {
-            return false;
-        }
-
-        for (String cls : classes) {
-            if (className.endsWith(cls)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

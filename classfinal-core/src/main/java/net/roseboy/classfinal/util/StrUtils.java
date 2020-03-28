@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * 字符串工具
@@ -179,7 +180,7 @@ public class StrUtils {
     }
 
     /**
-     * 在字符串的某个文职插入字符串
+     * 在字符串的某个位置插入字符串
      *
      * @param arrayStr  字符串数组
      * @param insertStr 要插入的字串
@@ -200,6 +201,43 @@ public class StrUtils {
             newStr.append(insertStr).append("\r\n");
         }
         return newStr.toString();
+    }
+
+    /**
+     * 通配符匹配
+     *
+     * @param match      匹配字符串
+     * @param testString 待匹配字符窜
+     * @return 是否匹配
+     */
+    public static boolean isMatch(String match, String testString) {
+        String regex = match.replaceAll("\\?", "(.?)")
+                .replaceAll("\\*+", "(.*?)");
+        return Pattern.matches(regex, testString);
+    }
+
+    /**
+     * 判断是否是匹配
+     *
+     * @param matches    匹配的
+     * @param testString 要判断
+     * @return 是否属于
+     */
+    public static boolean isMatchs(List<String> matches, String testString) {
+        return isMatchs(matches, testString, false);
+    }
+
+    public static boolean isMatchs(List<String> matches, String testString, boolean dv) {
+        if (matches == null || matches.size() == 0) {
+            return dv;
+        }
+
+        for (String m : matches) {
+            if (StrUtils.isMatch(m, testString) || testString.startsWith(m) || testString.endsWith(m)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

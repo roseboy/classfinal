@@ -95,7 +95,7 @@ public class CoreAgent {
 
         //验证密码,jar包是才验证
         byte[] passHash = JarDecryptor.readEncryptedFile(new File(JarUtils.getRootPath(null)), Const.CONFIG_PASSHASH);
-        if(passHash!=null){
+        if (passHash != null) {
             char[] p1 = StrUtils.toChars(passHash);
             char[] p2 = EncryptUtils.md5(StrUtils.merger(pwd, EncryptUtils.SALT));
             p2 = EncryptUtils.md5(StrUtils.merger(EncryptUtils.SALT, p2));

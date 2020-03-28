@@ -22,7 +22,7 @@ public class Application {
         Const.pringInfo();
         System.out.println("启动成功,访问期间请不要关闭此窗口!");
         System.out.println("请用浏览器访问: http://localhost:59999");
-        //openURL("http://localhost:59999/index/");
+        openURL("http://localhost:59999");
     }
 
     public static void openURL(String url) {

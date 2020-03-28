@@ -1,7 +1,5 @@
 package net.roseboy.classfinal.util;
 
-import net.roseboy.classfinal.Const;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -87,29 +85,15 @@ public class JarUtils {
         return targetJar;
     }
 
-    /**
-     * 释放jar内以及子jar的所有文件
-     *
-     * @param jarPath     jar文件
-     * @param targetDir   释放文件夹
-     * @param includeJars 需要再次释放的jar文件，为空释放所有
-     * @return 所有文件的完整路径，包含目录
-     */
-    public static List<String> unJar(String jarPath, String targetDir, List<String> includeJars) {
-        return unJar(jarPath, targetDir, includeJars, null, null);
-    }
 
     /**
      * 释放jar内以及子jar的所有文件
      *
-     * @param jarPath      jar文件
-     * @param targetDir    释放文件夹
-     * @param includeJars  需要再次释放的jar文件，为空释放所有
-     * @param excludeFiles 排除释放的文件，为空释放所有
+     * @param jarPath   jar文件
+     * @param targetDir 释放文件夹
      * @return 所有文件的完整路径，包含目录
      */
-    public static List<String> unJar(String jarPath, String targetDir, List<String> includeJars,
-                                     List<String> includeFiles, List<String> excludeFiles) {
+    public static List<String> unJar(String jarPath, String targetDir) {
         List<String> list = new ArrayList<>();
         File target = new File(targetDir);
         if (!target.exists()) {
@@ -120,12 +104,13 @@ public class JarUtils {
         ZipFile zipFile = null;
         try {
             zipFile = new ZipFile(new File(jarPath));
-
+            ZipEntry entry;
+            File targetFile;
             //先把文件夹创建出来
             Enumeration<?> entries = zipFile.entries();
             while (entries.hasMoreElements()) {
-                ZipEntry entry = (ZipEntry) entries.nextElement();
-                File targetFile = new File(target, entry.getName());
+                entry = (ZipEntry) entries.nextElement();
+                targetFile = new File(target, entry.getName());
                 if (entry.isDirectory()) {
                     if (!targetFile.exists()) {
                         targetFile.mkdirs();
@@ -136,40 +121,10 @@ public class JarUtils {
             //再释放文件
             entries = zipFile.entries();
             while (entries.hasMoreElements()) {
-                ZipEntry entry = (ZipEntry) entries.nextElement();
-                File targetFile = new File(target, entry.getName());
-                //跳过排除的文件
-                if (excludeFiles != null
-                        && (excludeFiles.contains(entry.getName()) || excludeFiles.contains(targetFile.getName()))) {
-                    continue;
-                }
-
-                //跳过未包含的文件
-                if (includeFiles != null && includeFiles.size() > 0 && !entry.isDirectory()
-                        && (!includeFiles.contains(entry.getName()) && !includeFiles.contains(targetFile.getName()))) {
-                    continue;
-                }
-
-                //释放jar文件，如果在includeJars中，递归释放jar内的文件
-                if (entry.getName().endsWith(".jar")) {
-                    byte[] bytes = IoUtils.toBytes(zipFile.getInputStream(entry));
-                    IoUtils.writeFile(targetFile, bytes);
-                    String jarName = targetFile.getName();
-                    if (includeJars == null || includeJars.size() == 0 || includeJars.contains(jarName)) {
-                        String targetPath0 = targetFile.getAbsolutePath();
-                        String targetDir0 = targetFile.getAbsolutePath().replace(".jar", Const.LIB_JAR_DIR);
-                        List<String> list0 = unJar(targetPath0, targetDir0, includeJars, includeFiles, excludeFiles);
-                        list.addAll(list0);
-                    }
-                }
-                //如果是目录，创建目录
-                else if (entry.isDirectory()) {
-                    if (!targetFile.exists()) {
-                        targetFile.mkdirs();
-                    }
-                }
-                //其他文件，直接释放
-                else {
+                entry = (ZipEntry) entries.nextElement();
+                targetFile = new File(target, entry.getName());
+                //如果是文件,解压文件
+                if (!entry.isDirectory()) {
                     byte[] bytes = IoUtils.toBytes(zipFile.getInputStream(entry));
                     IoUtils.writeFile(targetFile, bytes);
                 }
