@@ -300,8 +300,8 @@ public class JarEncryptor {
         thisJarPaths.forEach(thisJar -> {
             File thisJarFile = new File(thisJar);
             if ("jar".endsWith(this.jarOrWar) && thisJar.endsWith(".jar")) {
-                //List<String> includeFiles = Arrays.asList(Const.CLASSFINAL_FILES);
-                JarUtils.unJar(thisJar, this.targetDir.getAbsolutePath());
+                List<String> includeFiles = Arrays.asList(Const.CLASSFINAL_FILES);
+                JarUtils.unJar(thisJar, this.targetDir.getAbsolutePath(), includeFiles);
             } else if ("war".endsWith(this.jarOrWar) && thisJar.endsWith(".jar")) {
                 File targetClassFinalJar = new File(this.targetLibDir, thisJarFile.getName());
                 byte[] bytes = IoUtils.readFileToByte(thisJarFile);

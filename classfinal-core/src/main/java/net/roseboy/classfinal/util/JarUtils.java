@@ -94,6 +94,17 @@ public class JarUtils {
      * @return 所有文件的完整路径，包含目录
      */
     public static List<String> unJar(String jarPath, String targetDir) {
+        return unJar(jarPath, targetDir, null);
+    }
+
+    /**
+     * 释放jar内以及子jar的所有文件
+     *
+     * @param jarPath   jar文件
+     * @param targetDir 释放文件夹
+     * @return 所有文件的完整路径，包含目录
+     */
+    public static List<String> unJar(String jarPath, String targetDir, List<String> includeFiles) {
         List<String> list = new ArrayList<>();
         File target = new File(targetDir);
         if (!target.exists()) {
@@ -123,8 +134,13 @@ public class JarUtils {
             while (entries.hasMoreElements()) {
                 entry = (ZipEntry) entries.nextElement();
                 targetFile = new File(target, entry.getName());
+
                 //如果是文件,解压文件
                 if (!entry.isDirectory()) {
+                    //跳过未包含的文件
+                    if (includeFiles != null && includeFiles.size() > 0 && !includeFiles.contains(targetFile.getName())) {
+                        continue;
+                    }
                     byte[] bytes = IoUtils.toBytes(zipFile.getInputStream(entry));
                     IoUtils.writeFile(targetFile, bytes);
                 }
