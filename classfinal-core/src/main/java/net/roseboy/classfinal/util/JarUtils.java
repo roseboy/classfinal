@@ -122,10 +122,8 @@ public class JarUtils {
             while (entries.hasMoreElements()) {
                 entry = (ZipEntry) entries.nextElement();
                 targetFile = new File(target, entry.getName());
-                if (entry.isDirectory()) {
-                    if (!targetFile.exists()) {
-                        targetFile.mkdirs();
-                    }
+                if (entry.isDirectory() && !targetFile.exists()) {
+                    targetFile.mkdirs();
                 }
             }
 
@@ -133,17 +131,17 @@ public class JarUtils {
             entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 entry = (ZipEntry) entries.nextElement();
+                if (entry.isDirectory()) {
+                    continue;
+                }
                 targetFile = new File(target, entry.getName());
 
-                //如果是文件,解压文件
-                if (!entry.isDirectory()) {
-                    //跳过未包含的文件
-                    if (includeFiles != null && includeFiles.size() > 0 && !includeFiles.contains(targetFile.getName())) {
-                        continue;
-                    }
-                    byte[] bytes = IoUtils.toBytes(zipFile.getInputStream(entry));
-                    IoUtils.writeFile(targetFile, bytes);
+                //跳过未包含的文件
+                if (includeFiles != null && includeFiles.size() > 0 && !includeFiles.contains(targetFile.getName())) {
+                    continue;
                 }
+                byte[] bytes = IoUtils.toBytes(zipFile.getInputStream(entry));
+                IoUtils.writeFile(targetFile, bytes);
                 list.add(targetFile.getAbsolutePath());
             }
         } catch (Exception e) {
