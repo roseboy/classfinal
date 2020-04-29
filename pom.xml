@@ -11,11 +11,11 @@
 
     <groupId>net.roseboy</groupId>
     <artifactId>classfinal</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <modules>
         <module>classfinal-core</module><!--主要代码在这里-->
         <module>classfinal-fatjar</module><!--单独运行的jar、javaagent-->
-        <module>classfinal-web</module><!--webUI-->
+<!--        <module>classfinal-web</module>&lt;!&ndash;webUI&ndash;&gt;-->
         <module>classfinal-maven-plugin</module><!--maven插件-->
     </modules>
     <packaging>pom</packaging>

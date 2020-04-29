@@ -121,9 +121,19 @@ public class JarUtils {
             Enumeration<?> entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 entry = (ZipEntry) entries.nextElement();
-                targetFile = new File(target, entry.getName());
-                if (entry.isDirectory() && !targetFile.exists()) {
-                    targetFile.mkdirs();
+                if (entry.isDirectory()) {
+                    targetFile = new File(target, entry.getName());
+                    if(!targetFile.exists()){
+                        targetFile.mkdirs();
+                    }
+                } else {//有时候entries没有目录,根据文件路径创建目录
+                    int lastSeparatorIndex = entry.getName().lastIndexOf(File.separator);
+                    if (lastSeparatorIndex > 0) {
+                        targetFile = new File(target, entry.getName().substring(0, lastSeparatorIndex));
+                        if (!targetFile.exists()) {
+                            targetFile.mkdirs();
+                        }
+                    }
                 }
             }
 
